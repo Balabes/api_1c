@@ -1,0 +1,2539 @@
+openapi: 3.1.0
+info:
+  x-logo:
+    url: https://www.fitness1c.ru/local/templates/fitness.v2/images/logo_n.svg
+  title: API 1С:Фитнес клуб 4.0 V3
+  version: 1.0.0
+  description: 'Документация API для 1С:Fitness, редакция 4.0 v3
+
+
+    Для получения данных во всех методах используйте Basic авторизацию (Логин и пароль
+    пользователя 1С)
+
+
+    **usertoken** - Токен клиента
+
+
+    **token-master** - Токен родителя, используемый при оплате с аккаунта родителя
+    за ребенка.'
+servers:
+- url: https://app.1c.fitness/fitnessapi
+security:
+- basicAuth: []
+  apiKey: []
+paths:
+  /hs/api/v3/rental_rooms_v2/:
+    get:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    $ref: '#/components/schemas/ResultResponse'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RoomObject'
+              example:
+                result: true
+                data:
+                - id: 256bb709-3de1-11ea-96b7-38d547b31ac0
+                  title: Тренировочный зал
+                  description: ''
+                  photo: HTTP://localhost/Fitness4_0/hs/api/v2/files/123456/256bb709-3de1-11ea-96b7-38d547b31ac0-78709.png
+                  resources_used: false
+                  capacity: null
+                  area: null
+                  pictures:
+                  - HTTP://localhost/Fitness4_0/hs/api/v2/files/123456/256bb709-3de1-11ea-96b7-38d547b31ac0-78709.png
+                  sort_order: 170
+                  type:
+                    id: 1272ad8a-f76b-11ea-89de-2c4d546557dd
+                    title: Тип помещения
+                  location:
+                    id: 1272ad8a-f76b-11ea-89de-2c4d546557dd
+                    title: Локация
+                    color: '#A0A0A0'
+                  coating:
+                    id: 1272ad8a-f76b-11ea-89de-2c4d546557dd
+                    title: Покрытие
+                    color: '#4D4D4D'
+                - id: a7591f1c-f75f-11ea-89de-2c4d546557dd
+                  title: Футбольное поле
+                  description: ''
+                  photo: null
+                  resources_used: true
+                  resources:
+                  - resource:
+                      id: 1272ad8a-f76b-11ea-89de-2c4d546557dd
+                      title: Вторая половина
+                    included_resources:
+                    - resource:
+                        id: e782eee0-fc07-11ea-89df-2c4d546557dd
+                        title: Четверть поля 3
+                      included_resources: []
+                    - resource:
+                        id: e782eee1-fc07-11ea-89df-2c4d546557dd
+                        title: Четверть поля 4
+                      included_resources: []
+                  - resource:
+                      id: a7591f1d-f75f-11ea-89de-2c4d546557dd
+                      title: Половина поля
+                    included_resources:
+                    - resource:
+                        id: c708e4bd-0871-11eb-89e7-c860000abe74
+                        title: Четверти поля 2
+                      included_resources: []
+                    - resource:
+                        id: ad65a15b-f75f-11ea-89de-2c4d546557dd
+                        title: Четверть поля 1
+                      included_resources: []
+                  capacity: null
+                  area: null
+                  pictures:
+                  - HTTP://localhost/Fitness4_0/hs/api/v2/files/123456/256bb709-3de1-11ea-96b7-38d547b31ac0-78709.png
+                  sort_order: 170
+                  type:
+                    id: 1272ad8a-f76b-11ea-89de-2c4d546557dd
+                    title: Тип помещения
+                  location:
+                    id: 1272ad8a-f76b-11ea-89de-2c4d546557dd
+                    title: Локация
+                  coating:
+                    id: 1272ad8a-f76b-11ea-89de-2c4d546557dd
+                    title: Покрытие
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      summary: Получить список помещений доступных для аренды {rental_rooms_v2}
+      operationId: rental_rooms_v2
+      description: Метод возвращает массив структур помещений, доступных для аренды.
+      tags:
+      - Аренда зала
+      parameters:
+      - name: club_id
+        in: query
+        description: Идентификатор структурной единицы
+        required: true
+        schema:
+          type: string
+      - name: start_date
+        in: query
+        description: Дата начала периода (если не передана, то бедет использоваться
+          текущая дата)
+        schema:
+          type: string
+      - name: end_date
+        in: query
+        description: Дата окончания периода (если не передана, то бедет использоваться
+          текущая дата плюс месяц)
+        schema:
+          type: string
+      - name: service_id
+        in: query
+        description: Идентификатор услуги
+        schema:
+          type: string
+      - name: type
+        in: query
+        description: Идентификатор типа помещения
+        schema:
+          type: string
+      - name: location
+        in: query
+        description: Идентификатор локации помещения
+        schema:
+          type: string
+      - name: coating
+        in: query
+        description: Идентификатор покрытия помещения
+        schema:
+          type: string
+  /hs/api/v3/rental_times_v2/:
+    get:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    $ref: '#/components/schemas/ResultResponse'
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        time:
+                          description: Время записи
+                          type: string
+                        seance_length:
+                          description: Длительность слота (в минутах)
+                          type: number
+                        date_time:
+                          description: Дата и время записи
+                          type: string
+                        price:
+                          description: Цена
+                          type: number
+                        locations:
+                          description: Массив локаций
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                $ref: '#/components/schemas/ID'
+                              title:
+                                $ref: '#/components/schemas/Title'
+                              color:
+                                type: string
+                                description: Цвет (#FFFFFF)
+                        coatings:
+                          description: Массив покрытий
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                $ref: '#/components/schemas/ID'
+                              title:
+                                $ref: '#/components/schemas/Title'
+                              color:
+                                type: string
+                                description: Цвет (#FFFFFF)
+                      required:
+                      - time
+                      - seance_length
+                      - date_time
+              example:
+                result: true
+                data:
+                - time: '15:30'
+                  seance_length: 30
+                  date_time: 2019-10-24 15:30
+                  price: 100
+                  locations:
+                  - id: e32850b1-131c-11f1-b20c-001a7dda7115
+                    title: Локация 2
+                    color: '#F4ECC5'
+                  - id: 5bba14c0-0bdd-11f1-b20c-001a7dda7115
+                    title: Локация 1
+                    color: '#A0A0A0'
+                  coatings:
+                  - id: e9417af7-131c-11f1-b20c-001a7dda7115
+                    title: Покрытие 2
+                    color: '#1E90FF'
+                  - id: 62a3f9e8-0bdd-11f1-b20c-001a7dda7115
+                    title: Покрытие 1
+                    color: '#4D4D4D'
+                - time: '16:00'
+                  seance_length: 30
+                  date_time: 2019-10-24 16:00
+                  price: 100
+                  locations:
+                  - id: e32850b1-131c-11f1-b20c-001a7dda7115
+                    title: Локация 2
+                    color: '#F4ECC5'
+                  coatings:
+                  - id: e9417af7-131c-11f1-b20c-001a7dda7115
+                    title: Покрытие 2
+                    color: '#1E90FF'
+                - time: '16:30'
+                  seance_length: 30
+                  date_time: 2019-10-24 16:30
+                  price: 100
+                  locations:
+                  - id: e32850b1-131c-11f1-b20c-001a7dda7115
+                    title: Локация 2
+                    color: '#F4ECC5'
+                  - id: 5bba14c0-0bdd-11f1-b20c-001a7dda7115
+                    title: Локация 1
+                    color: '#A0A0A0'
+                  coatings:
+                  - id: e9417af7-131c-11f1-b20c-001a7dda7115
+                    title: Покрытие 2
+                    color: '#1E90FF'
+                  - id: 62a3f9e8-0bdd-11f1-b20c-001a7dda7115
+                    title: Покрытие 1
+                    color: '#4D4D4D'
+                - time: '17:00'
+                  seance_length: 30
+                  date_time: 2019-10-24 17:00
+                  price: 100
+                  locations:
+                  - id: e32850b1-131c-11f1-b20c-001a7dda7115
+                    title: Локация 2
+                    color: '#F4ECC5'
+                  coatings:
+                  - id: e9417af7-131c-11f1-b20c-001a7dda7115
+                    title: Покрытие 2
+                    color: '#1E90FF'
+                - time: '17:30'
+                  seance_length: 60
+                  date_time: 2019-10-24 17:30
+                  price: 100
+                  locations:
+                  - id: e32850b1-131c-11f1-b20c-001a7dda7115
+                    title: Локация 2
+                    color: '#F4ECC5'
+                  - id: 5bba14c0-0bdd-11f1-b20c-001a7dda7115
+                    title: Локация 1
+                    color: '#A0A0A0'
+                  coatings:
+                  - id: e9417af7-131c-11f1-b20c-001a7dda7115
+                    title: Покрытие 2
+                    color: '#1E90FF'
+                  - id: 62a3f9e8-0bdd-11f1-b20c-001a7dda7115
+                    title: Покрытие 1
+                    color: '#4D4D4D'
+                - time: '18:30'
+                  seance_length: 90
+                  date_time: 2019-10-24 18:30
+                  price: 100
+                  locations:
+                  - id: e32850b1-131c-11f1-b20c-001a7dda7115
+                    title: Локация 2
+                    color: '#F4ECC5'
+                  coatings:
+                  - id: e9417af7-131c-11f1-b20c-001a7dda7115
+                    title: Покрытие 2
+                    color: '#1E90FF'
+                - time: '20:00'
+                  seance_length: 30
+                  date_time: 2019-10-24 20:00
+                  price: 100
+                  locations:
+                  - id: e32850b1-131c-11f1-b20c-001a7dda7115
+                    title: Локация 2
+                    color: '#F4ECC5'
+                  coatings:
+                  - id: e9417af7-131c-11f1-b20c-001a7dda7115
+                    title: Покрытие 2
+                    color: '#1E90FF'
+                - time: '20:30'
+                  seance_length: 30
+                  date_time: 2019-10-24 20:30
+                  price: 100
+                  locations:
+                  - id: e32850b1-131c-11f1-b20c-001a7dda7115
+                    title: Локация 2
+                    color: '#F4ECC5'
+                  coatings:
+                  - id: e9417af7-131c-11f1-b20c-001a7dda7115
+                    title: Покрытие 2
+                    color: '#1E90FF'
+                - time: '21:00'
+                  seance_length: 30
+                  date_time: 2019-10-24 21:00
+                  price: 100
+                  locations:
+                  - id: e32850b1-131c-11f1-b20c-001a7dda7115
+                    title: Локация 2
+                    color: '#F4ECC5'
+                  coatings:
+                  - id: e9417af7-131c-11f1-b20c-001a7dda7115
+                    title: Покрытие 2
+                    color: '#1E90FF'
+                - time: '21:30'
+                  seance_length: 30
+                  date_time: 2019-10-24 21:30
+                  price: 100
+                  locations:
+                  - id: e32850b1-131c-11f1-b20c-001a7dda7115
+                    title: Локация 2
+                    color: '#F4ECC5'
+                  coatings:
+                  - id: e9417af7-131c-11f1-b20c-001a7dda7115
+                    title: Покрытие 2
+                    color: '#1E90FF'
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      summary: Слоты для записи {rental_times_v2}
+      operationId: rental_times_v2
+      description: Метод возвращает массив свободных интервалов для записи в переданном
+        диапазоне дат
+      tags:
+      - Аренда зала
+      parameters:
+      - name: start_date
+        in: query
+        description: Дата начала периода (если не передана, то бедет использоваться
+          текущая дата)
+        schema:
+          type: string
+      - name: end_date
+        in: query
+        description: Дата окончания периода (если не передана, то бедет использоваться
+          текущая дата плюс месяц)
+        schema:
+          type: string
+      - name: service_id
+        in: query
+        description: Идентификатор услуги
+        schema:
+          type: string
+      - name: room_id
+        in: query
+        description: Идентификатор помещения
+        schema:
+          type: string
+      - name: club_id
+        in: query
+        description: Идентификатор структурной единицы
+        required: true
+        schema:
+          type: string
+      - name: type
+        in: query
+        description: Идентификатор типа помещения
+        schema:
+          type: string
+      - name: location
+        in: query
+        description: Идентификатор локации помещения
+        schema:
+          type: string
+      - name: coating
+        in: query
+        description: Идентификатор покрытия помещения
+        schema:
+          type: string
+  /hs/api/v3/rental_rooms_times_v2/:
+    get:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    $ref: '#/components/schemas/ResultResponse'
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        room:
+                          description: Описание помещения
+                          type: object
+                          properties:
+                            id:
+                              $ref: '#/components/schemas/ID'
+                            title:
+                              $ref: '#/components/schemas/Title'
+                            photo:
+                              type: string
+                              description: Изображение зала
+                              x-nullable: true
+                            pictures:
+                              type: array
+                              description: Изображения зала
+                              x-nullable: true
+                            location:
+                              description: Локация
+                              type: object
+                              properties:
+                                id:
+                                  $ref: '#/components/schemas/ID'
+                                title:
+                                  $ref: '#/components/schemas/Title'
+                                color:
+                                  type: string
+                                  description: Цвет (#FFFFFF)
+                            coating:
+                              description: Покрытие
+                              type: object
+                              properties:
+                                id:
+                                  $ref: '#/components/schemas/ID'
+                                title:
+                                  $ref: '#/components/schemas/Title'
+                                color:
+                                  type: string
+                                  description: Цвет (#FFFFFF)
+                        durations:
+                          description: Массив интервалов
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              time:
+                                description: Время записи
+                                type: string
+                              seance_length:
+                                description: Длительность слота (в минутах)
+                                type: number
+                              date_time:
+                                description: Дата и время записи
+                                type: string
+                              price:
+                                description: Цена
+                                type: number
+                      required:
+                      - room
+                      - durations
+              example:
+                result: true
+                data:
+                - room:
+                    id: ac4d718b-1e45-11ef-b1bf-f02f7488d897
+                    title: Корт 1
+                    location:
+                      id: e32850b1-131c-11f1-b20c-001a7dda7115
+                      title: Локация 2
+                      color: '#F4ECC5'
+                    coating:
+                      id: 62a3f9e8-0bdd-11f1-b20c-001a7dda7115
+                      title: Покрытие 1
+                      color: '#4D4D4D'
+                  durations:
+                  - time: 630
+                    seance_length: 30
+                    date_time: 2026-02-27 11:00
+                    price: 100
+                  - time: 660
+                    seance_length: 30
+                    date_time: 2026-02-27 10:30
+                    price: 100
+                - room:
+                    id: ac4d718b-1e45-11ef-b1bf-f02f7488d897
+                    title: Корт 2
+                    location:
+                      id: e32850b1-131c-11f1-b20c-001a7dda7115
+                      title: Локация 2
+                      color: '#F4ECC5'
+                    coating:
+                      id: 62a3f9e8-0bdd-11f1-b20c-001a7dda7115
+                      title: Покрытие 1
+                      color: '#4D4D4D'
+                  durations:
+                  - time: 630
+                    seance_length: 30
+                    date_time: 2026-02-27 11:00
+                    price: 100
+                  - time: 660
+                    seance_length: 30
+                    date_time: 2026-02-27 10:30
+                    price: 100
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      summary: Слоты для записи по помещениям на определенную дату {rental_rooms_times_v2}
+      operationId: rental_rooms_times_v2
+      description: Метод возвращает массив свободных интервалов для записи на переданную
+        дату
+      tags:
+      - Аренда зала
+      parameters:
+      - name: start_date
+        in: query
+        description: Дата начала периода (если не передана, то бедет использоваться
+          текущая дата)
+        schema:
+          type: string
+      - name: end_date
+        in: query
+        description: Дата окончания периода (если не передана, то бедет использоваться
+          конец текущего дня)
+        schema:
+          type: string
+      - name: service_id
+        in: query
+        description: Идентификатор услуги
+        schema:
+          type: string
+      - name: room_id
+        in: query
+        description: Идентификатор помещения
+        schema:
+          type: string
+      - name: club_id
+        in: query
+        description: Идентификатор структурной единицы
+        required: true
+        schema:
+          type: string
+      - name: type
+        in: query
+        description: Идентификатор типа помещения
+        schema:
+          type: string
+      - name: location
+        in: query
+        description: Идентификатор локации помещения
+        schema:
+          type: string
+      - name: coating
+        in: query
+        description: Идентификатор покрытия помещения
+        schema:
+          type: string
+  /hs/api/v3/rental_schedule/:
+    get:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    $ref: '#/components/schemas/ResultResponse'
+                  data:
+                    $ref: '#/components/schemas/RentalSchedule'
+              example:
+                result: true
+                data:
+                - day: 1
+                  times:
+                  - time_start: '10:00'
+                    time_end: '10:30'
+                    duration: 30
+                  - time_start: '10:30'
+                    time_end: '11:00'
+                    duration: 30
+                - day: 2
+                  times:
+                  - time_start: '10:00'
+                    time_end: '10:30'
+                    duration: 30
+                  - time_start: '10:30'
+                    time_end: '11:00'
+                    duration: 30
+                - day: 3
+                  times:
+                  - time_start: '10:00'
+                    time_end: '10:30'
+                    duration: 30
+                  - time_start: '10:30'
+                    time_end: '11:00'
+                    duration: 30
+                - day: 4
+                  times:
+                  - time_start: '10:00'
+                    time_end: '10:30'
+                    duration: 30
+                  - time_start: '10:30'
+                    time_end: '11:00'
+                    duration: 30
+                - day: 5
+                  times:
+                  - time_start: '10:00'
+                    time_end: '10:30'
+                    duration: 30
+                  - time_start: '10:30'
+                    time_end: '11:00'
+                    duration: 30
+                - day: 6
+                  times:
+                  - time_start: '10:00'
+                    time_end: '10:30'
+                    duration: 30
+                  - time_start: '10:30'
+                    time_end: '11:00'
+                    duration: 30
+                - day: 7
+                  times:
+                  - time_start: '10:00'
+                    time_end: '10:30'
+                    duration: 30
+                  - time_start: '10:30'
+                    time_end: '11:00'
+                    duration: 30
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      summary: Получить список временных интервалов для аренды {rental_schedule}
+      operationId: rental_schedule
+      description: Метод возвращает массив временных интервалов доступных для аренды.
+      tags:
+      - Аренда зала
+      parameters:
+      - name: club_id
+        in: query
+        description: Идентификатор структурной единицы
+        required: true
+        schema:
+          type: string
+      - name: room_id
+        in: query
+        description: Идентификатор помещения
+        schema:
+          type: string
+  /hs/api/v3/check_rental_intervals/:
+    get:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    $ref: '#/components/schemas/ResultResponse'
+                  data:
+                    type: object
+                    properties:
+                      success_сount:
+                        type: integer
+                        description: Количество дней с графиком работы
+                      fail_count:
+                        type: integer
+                        description: Количество дней без графика работы
+              example:
+                result: true
+                data:
+                  success_сount: 10
+                  fail_count: 1
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      summary: Проверка возможности бронирования в интервале {check_rental_intervals}
+      operationId: check_rental_intervals
+      description: Метод возвращает количество рабочих и нерабочих дней. Если 'fail_count'
+        больше 0, значит интервал не доступен для бронирования
+      tags:
+      - Аренда зала
+      parameters:
+      - name: club_id
+        in: query
+        description: Идентификатор структурной единицы
+        required: true
+        schema:
+          type: string
+      - name: room_id
+        in: query
+        description: Идентификатор помещения
+        schema:
+          type: string
+      - name: start_date
+        required: true
+        in: query
+        description: Начало интервала
+        schema:
+          type: string
+      - name: end_date
+        in: query
+        required: true
+        description: Конец интервала
+        schema:
+          type: string
+  /hs/api/v3/prepare_rental/:
+    post:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    $ref: '#/components/schemas/ResultResponse'
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        room:
+                          $ref: '#/components/schemas/RoomObject'
+                        employee_id:
+                          $ref: '#/components/schemas/ID'
+                        purchase_id:
+                          description: Идентификатор номенклатуры. Потребуется для
+                            последующего создания ссылки на оплату интервалов
+                          $ref: '#/components/schemas/ID'
+                        count:
+                          type: integer
+                          description: Общее количество выбранных интервалов
+                        success:
+                          type: array
+                          description: Массив свободных временных интервалов
+                        fail:
+                          type: array
+                          description: Массив занятых временных интервалов
+              example:
+                result: true
+                data:
+                - room:
+                    id: 256bb709-3de1-11ea-96b7-38d547b31ac0
+                    title: Тренировочный зал
+                    description: ''
+                    photo: HTTP://localhost/Fitness4_0/hs/api/v2/files/123456/256bb709-3de1-11ea-96b7-38d547b31ac0-78709.png
+                    resources_used: false
+                    capacity: null
+                    area: null
+                    pictures:
+                    - HTTP://localhost/Fitness4_0/hs/api/v2/files/123456/256bb709-3de1-11ea-96b7-38d547b31ac0-78709.png
+                    sort_order: 170
+                    type:
+                      id: 1272ad8a-f76b-11ea-89de-2c4d546557dd
+                      title: Тип помещения
+                    location:
+                      id: 1272ad8a-f76b-11ea-89de-2c4d546557dd
+                      title: Локация
+                    coating:
+                      id: 1272ad8a-f76b-11ea-89de-2c4d546557dd
+                      title: Покрытие
+                  employee_id: null
+                  purchase_id: 9334908e-a472-11ec-b145-f02f7488d897
+                  count: 3
+                  success:
+                  - '2026-02-23T16:00:00'
+                  - '2026-02-24T15:00:00'
+                  fail:
+                  - '2026-02-17T15:00:00'
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      summary: Проверить выбранные временные интервалы {prepare_rental}
+      operationId: prepare_rental
+      description: |
+        Метод возвращает массив временных интервалов для аренды.
+        При бронировании платной раздевалки (сьюта) в теле запроса передается:
+        - `locker_room_id` — ID (UUID) услуги улучшения раздевалки (поле `service_id` из метода `locker_rooms`) ЛИБО ID помещения сьюта (поле `id` из метода `locker_rooms`). При передаче ID помещения 1С автоматически сопоставляет его с нужной услугой улучшения.
+        - `locker_room_count` — количество запрашиваемых раздевалок (1 или 2). По умолчанию: 1.
+        Метод проверяет наличие требуемого количества свободных раздевалок указанной услуги на выбранные слоты.
+      tags:
+      - Аренда зала
+      parameters:
+      - name: club_id
+        in: query
+        description: Идентификатор структурной единицы
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            example:
+              start_date: '2022-02-08'
+              end_date: '2022-02-08'
+              room_id: e07e5bc4-2bf9-11ec-910f-2c4d546557dd
+              schedule:
+              - day: 2
+                times:
+                - '15:00'
+                - '16:00'
+              locker_room_id: 445e1400-013f-11f1-8939-0050568b5c63
+              locker_room_count: 1
+            schema:
+              type: object
+              properties:
+                room_id:
+                  type: string
+                  description: Идентификатор помещения корта
+                start_date:
+                  type: string
+                  description: Начало интервала
+                end_date:
+                  type: string
+                  description: Конец интервала
+                schedule:
+                  description: Расписание выбранных интервалов
+                  $ref: '#/components/schemas/RentalScheduleTimes'
+                locker_room_id:
+                  type: string
+                  description: 'Идентификатор (UUID) услуги улучшения раздевалки (поле service_id из locker_rooms) ЛИБО помещения сьюта (поле id из locker_rooms). Если параметр не передан — сьют не бронируется (общая раздевалка).'
+                locker_room_count:
+                  type: integer
+                  description: Количество запрашиваемых раздевалок (1 или 2). Если параметр не передан или равен 0, по умолчанию принимается 1.
+              required:
+              - room_id
+              - start_date
+              - end_date
+              - schedule
+  /hs/api/v3/booking_rental/:
+    post:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    $ref: '#/components/schemas/ResultResponse'
+                  data:
+                    type: 'null'
+              example:
+                result: true
+                data: null
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      summary: Забронировать временные интервалы {booking_rental}
+      operationId: booking_rental
+      description: |
+        Метод бронирует временные интервалы для оплаты клиентом (создает запись в регистре сведений «МассовоеБронированиеАренды»).
+        При бронировании платной раздевалки (сьюта) в теле запроса передается:
+        - `locker_room_id` — ID (UUID) услуги улучшения раздевалки (поле `service_id` из метода `locker_rooms`) ЛИБО ID помещения сьюта (поле `id` из метода `locker_rooms`). При передаче ID помещения 1С автоматически сопоставляет его с нужной услугой улучшения.
+        - `locker_room_count` — количество запрашиваемых раздевалок (1 или 2). По умолчанию: 1.
+        Метод автоматически подбирает свободные раздевалки указанной услуги (приоритетно в той же локации, что и корт) и сохраняет их в регистре брони.
+      tags:
+      - Аренда зала
+      parameters:
+      - name: club_id
+        in: query
+        description: Идентификатор структурной единицы
+        required: true
+        schema:
+          type: string
+      - name: room_id
+        in: query
+        description: Идентификатор помещения
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            examples:
+              example:
+                value:
+                  room_id: c3c60072-1e55-11ef-b1bf-f02f7488d897
+                  start_date: 2026-02-17 00:00
+                  end_date: 2026-03-17 00:00
+                  schedule:
+                  - day: 1
+                    times:
+                    - '15:00'
+                    - '16:00'
+                  - day: 2
+                    times:
+                    - '15:00'
+                    - '16:00'
+                  locker_room_id: 445e1400-013f-11f1-8939-0050568b5c63
+                  locker_room_count: 1
+            schema:
+              type: object
+              properties:
+                room_id:
+                  type: string
+                  description: Идентификатор помещения корта
+                start_date:
+                  type: string
+                  description: Начало интервала
+                end_date:
+                  type: string
+                  description: Конец интервала
+                schedule:
+                  description: Расписание выбранных интервалов
+                  $ref: '#/components/schemas/RentalScheduleTimes'
+                locker_room_id:
+                  type: string
+                  description: 'Идентификатор (UUID) услуги улучшения раздевалки (поле service_id из locker_rooms) ЛИБО помещения сьюта (поле id из locker_rooms). Если параметр не передан — сьют не бронируется (общая раздевалка).'
+                locker_room_count:
+                  type: integer
+                  description: Количество запрашиваемых раздевалок (1 или 2). Если параметр не передан или равен 0, по умолчанию принимается 1.
+              required:
+              - room_id
+              - start_date
+              - end_date
+              - schedule
+  /hs/api/v3/payment_link:
+    post:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      link:
+                        type: string
+                      id:
+                        type: string
+                        description: Идентификатор заказа. Используется для последующего
+                          запроса статуса оплаты платёжной ссылки.
+                    required:
+                    - id
+                title: СоздатьСсылкуНаОплатуOk
+              examples:
+                example1:
+                  value:
+                    result: true
+                    data:
+                      link: https://glk.me/sNwyY
+                example2:
+                  value:
+                    result: true
+                    data:
+                      link: https://glk.me/sNwyY
+                example3:
+                  value:
+                    result: true
+                    data:
+                      link: https://glk.me/sNwyY
+                example4:
+                  value:
+                    result: true
+                    data:
+                      id: 1234
+                      link: https://glk.me/sNwyY
+      summary: Создать ссылку на оплату {payment_link}
+      operationId: payment_link
+      description: ''
+      tags:
+      - Оплаты
+      parameters:
+      - name: apikey
+        in: header
+        description: e.g. 409265d1-a0af-4ce8-88ec-7e3435024111
+        required: false
+        schema:
+          type: string
+        example: 409265d1-a0af-4ce8-88ec-7e3435024111
+      - name: usertoken
+        in: header
+        description: e.g. 7e8245d1-574f-4ce8-88ec-7e34358df45
+        required: false
+        schema:
+          type: string
+        example: 7e8245d1-574f-4ce8-88ec-7e34358df45
+      - name: token-master
+        in: header
+        description: e.g. a62afb1e-97b2-11e7-b142-0050568b93ed
+        required: false
+        schema:
+          type: string
+        example: a62afb1e-97b2-11e7-b142-0050568b93ed
+      requestBody:
+        content:
+          application/json:
+            examples:
+              example1:
+                value:
+                  transaction_id: 1211
+                  cart:
+                  - purchase_id: a62afb1e-97b2-11e7-b142-0050568b93ed
+                    count: 1
+                  payment_list:
+                  - type: cash
+                    amount: 11000
+                  - type: card
+                    amount: 8000
+                  - type: deposit
+                    id: ea18da46-98cf-11e9-89a3-2c4d546557dd
+                    amount: 2000
+                  club_id: 849235b6-2bf5-11ec-910f-2c4d546557dd
+              example2:
+                value:
+                  transaction_id: 1211
+                  cart_rental:
+                  - record_array:
+                    - date_time: '2026-02-17T10:00:00'
+                    service_id: a62afb1e-97b2-11e7-b142-0050568b93ed
+                    room_id: a62afb1e-97b2-11e7-b142-0050568b93ed
+                    searchTrainer: false
+                  payment_list:
+                  - type: cash
+                    amount: 11000
+                  - type: card
+                    amount: 8000
+                  - type: deposit
+                    deposit_id: ea18da46-98cf-11e9-89a3-2c4d546557dd
+                    amount: 2000
+              example3:
+                value:
+                  transaction_id: 1211
+                  sales:
+                  - 90fd70c4-c8f9-45f2-8baf-bd5ec3457bbf
+                  - 200d967f-66f7-4ca9-90c0-af99d91f50cd
+                  payment_list:
+                  - type: cash
+                    amount: 11000
+                  - type: card
+                    amount: 8000
+                  - type: deposit
+                    deposit_id: ea18da46-98cf-11e9-89a3-2c4d546557dd
+                    amount: 2000
+              example4:
+                value:
+                  club_id: 849235b6-2bf5-11ec-910f-2c4d546557dd
+                  deposit_id: 05f5afff-e166-11e6-b16f-3085a98f71a0
+                  transaction_id: '789654121'
+                  cost: 2000
+            schema:
+              type: object
+              required:
+              - club_id
+              - transaction_id
+              - payment_list
+              - cart
+              - cost
+              - deposit_id
+              - sales
+              properties:
+                club_id:
+                  type: string
+                  description: Идентификатор структурной единицы
+                transaction_id:
+                  type: string
+                  description: Идентификатор транзакции
+                payment_info:
+                  $ref: '#/components/schemas/paymentInfo'
+                  description: Структура дополнительной информации
+                payment_list:
+                  $ref: '#/components/schemas/PaymentList'
+                  description: Массив структур оплат
+                cart:
+                  $ref: '#/components/schemas/cart'
+                  description: Массив структур оплачиваемых номенклатур
+                cart_rental:
+                  $ref: '#/components/schemas/CartRental'
+                  description: Массив структур оплачиваемых номенклатур аренды
+                lead_id:
+                  type: string
+                  description: Идентификатор лида
+                promocode:
+                  type: string
+                  description: Промокод
+                cost:
+                  type: string
+                  description: Сумма пополнения (число с плавающей точкой(float))
+                deposit_id:
+                  type: string
+                  description: (required, string)
+                sales:
+                  type: string
+                  description: Массив идентификаторов реализаций
+                mass_booking:
+                  type: boolean
+                  description: Признак массовой аренды. Обязателен при массовом бронировании
+  /hs/api/v3/appointment_trainers_v2/:
+    get:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    $ref: '#/components/schemas/ResultResponse'
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          $ref: '#/components/schemas/ID'
+                        name:
+                          description: ФИО сотрудника
+                          $ref: '#/components/schemas/Title'
+                        position:
+                          description: Должность сотрудника
+                          $ref: '#/components/schemas/IDTitle'
+                        department:
+                          description: Подразделение
+                          $ref: '#/components/schemas/IDTitle'
+                        photo:
+                          description: Ссылка на фото
+                          x-nullable: true
+                        description:
+                          type: string
+                          description: Описание сотрудника
+                        category:
+                          description: Вид цен
+                          $ref: '#/components/schemas/IDTitle'
+                        price:
+                          description: Цена
+                          type: number
+                      required:
+                      - id
+                      - name
+              example:
+                result: true
+                data:
+                - id: 85f690f4-9925-11e7-bc3f-0050568b93ed
+                  name: Сотрудник 114
+                  position:
+                    title: Тренер
+                    id: 85f690e1-9925-11e7-bc3f-0050568b93ed
+                  department:
+                    title: null
+                    id: null
+                  photo: null
+                  description: Описание
+                  category:
+                    title: Рознечная цена
+                    id: 85f690e1-9925-11e7-bc3f-0050568b93ed
+                  price: 1000
+                - id: 85f69116-9925-11e7-bc3f-0050568b93ed
+                  name: Сотрудник 125
+                  position:
+                    title: Тренер
+                    id: 85f690e1-9925-11e7-bc3f-0050568b93ed
+                  department:
+                    title: null
+                    id: null
+                  photo: null
+                  description: Описание
+                  category:
+                    title: Рознечная цена
+                    id: 85f690e1-9925-11e7-bc3f-0050568b93ed
+                  price: 1000
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      summary: Получить тренеров для записи {appointment_trainers_v2}
+      operationId: appointment_trainers_v2
+      description: ''
+      tags:
+      - Персональные занятия
+      parameters:
+      - name: start_date
+        in: query
+        description: Дата начала периода (если не передана, то будет использоваться
+          текущая дата)
+        schema:
+          type: string
+      - name: end_date
+        in: query
+        description: Дата окончания периода (если не передана, то будет использоваться
+          текущая дата плюс месяц)
+        schema:
+          type: string
+      - name: room_id
+        in: query
+        description: Идентификатор помещения
+        required: true
+        schema:
+          type: string
+      - name: club_id
+        in: query
+        description: Идентификатор структурной единицы
+        schema:
+          type: string
+  /hs/api/v3/locker_rooms/:
+    get:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    $ref: '#/components/schemas/ResultResponse'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RoomObject'
+              example:
+                result: true
+                data:
+                - id: 256bb709-3de1-11ea-96b7-38d547b31ac0
+                  title: Тренировочный зал
+                  description: ''
+                  photo: HTTP://localhost/Fitness4_0/hs/api/v2/files/123456/256bb709-3de1-11ea-96b7-38d547b31ac0-78709.png
+                  resources_used: false
+                  capacity: null
+                  area: null
+                  pictures:
+                  - HTTP://localhost/Fitness4_0/hs/api/v2/files/123456/256bb709-3de1-11ea-96b7-38d547b31ac0-78709.png
+                  type:
+                    id: 1272ad8a-f76b-11ea-89de-2c4d546557dd
+                    title: Тип помещения
+                  location:
+                    id: 1272ad8a-f76b-11ea-89de-2c4d546557dd
+                    title: Локация
+                    color: '#A0A0A0'
+                  coating:
+                    id: 1272ad8a-f76b-11ea-89de-2c4d546557dd
+                    title: Покрытие
+                    color: '#4D4D4D'
+                  price: 1000
+                  included: false
+                  service_id: 445e1400-013f-11f1-8939-0050568b5c63
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      summary: Получить список раздевалок {locker_rooms}
+      operationId: locker_rooms
+      description: Метод возвращает массив структур раздевалок
+      tags:
+      - Аренда зала
+      parameters:
+      - name: club_id
+        in: query
+        description: Идентификатор структурной единицы
+        required: true
+        schema:
+          type: string
+      - name: start_date
+        in: query
+        description: Дата начала периода (если не передана, то бедет использоваться
+          текущая дата)
+        schema:
+          type: string
+      - name: end_date
+        in: query
+        description: Дата окончания периода (если не передана, то бедет использоваться
+          текущая дата плюс месяц)
+        schema:
+          type: string
+      - name: usertoken
+        in: header
+        description: Ключ клиента
+        required: true
+        schema:
+          type: string
+        example: 580392-e6ba49428-0ac67fcd-f2180121
+  /hs/api/v3/interval_rental/:
+    post:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    $ref: '#/components/schemas/ResultResponse'
+                  data:
+                    description: Данные результата
+                    type: object
+                    properties:
+                      rentals:
+                        description: Массив созданных аренд
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            rental:
+                              description: Данные аренды
+                              type: object
+                              properties:
+                                id:
+                                  $ref: '#/components/schemas/ID'
+                                title:
+                                  $ref: '#/components/schemas/Title'
+                                service:
+                                  description: Структура номенклатуры
+                                  $ref: '#/components/schemas/IDTitle'
+                                date_time:
+                                  description: Время аренды
+                                  type: string
+                            customer:
+                              description: Структура клиента
+                              type: object
+                              properties:
+                                id:
+                                  $ref: '#/components/schemas/ID'
+                                client_name:
+                                  type: string
+                                  description: ФИО клиента
+                                phone:
+                                  description: Номера телефонов
+                                  type: array
+                                  items:
+                                    type: string
+                                email:
+                                  description: Электронные почты
+                                  type: array
+                                  items:
+                                    type: string
+                            status:
+                              description: "Статус занятия (null когда клиент не записан)\
+                                \ \n- \"temporarily_reserved_need_payment\" - Временная\
+                                \ бронь \n- \"reserved\" - Записан без оплаты  \n\
+                                - \"reserved_and_payed\" - Записан и оплачено  "
+                              type:
+                              - string
+                              - 'null'
+                            temporarily_reserved:
+                              description: Временная бронь
+                              type: boolean
+                      temporarily_reserved:
+                        description: Временная бронь
+                        type: boolean
+                      cart:
+                        description: Структура покупки
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            record_array:
+                              description: Массив интервалов записи
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  date_time:
+                                    description: 'Время записи в формате: yyyy-MM-dd
+                                      HH:mm:ss'
+                                    type: string
+                                  duration:
+                                    description: Длительность слота
+                                    type: number
+                                  rental_id:
+                                    description: Идентификатор аренды, если она ранее
+                                      была создана
+                                    $ref: '#/components/schemas/ID'
+                                required:
+                                - date_time
+                                - duration
+                                - rental_id
+                            service_id:
+                              description: Идентификатор услуги
+                              $ref: '#/components/schemas/ID'
+                            room_id:
+                              description: Идентификатор помещения
+                              $ref: '#/components/schemas/ID'
+                            resources:
+                              description: Массив идентификаторов ресурсов
+                              type: array
+                              items:
+                                $ref: '#/components/schemas/ID'
+              example:
+                result: true
+                data:
+                  rentals:
+                  - rental:
+                      id: a771d6b2-9479-4c70-8545-4c8489aeebde
+                      title: Аренда с расширенным ценообразованием
+                      service:
+                        id: 11fa72a4-7a85-11ec-b13e-f02f7488d897
+                        title: Аренда с расширенным ценообразованием
+                      date_time: '2023-02-28 19:00:00'
+                    customer:
+                      id: f2adaa8f-6cb4-11ed-b167-f02f7488d897
+                      client_name: Орлов Тест Александрович
+                      phone:
+                      - '70000000000'
+                      email:
+                      - 5@mail.ru
+                    status: temporarily_reserved_need_payment
+                    temporarily_reserved: true
+                  temporarily_reserved: true
+                  cart:
+                  - record_array:
+                    - date_time: '2023-02-28 19:00:00'
+                      duration: 120
+                      rental_id: f2adaa8f-6cb4-11ed-b167-f02f7488d897
+                    - date_time: '2023-02-28 22:00:00'
+                      duration: 60
+                      rental_id: 885fa908-ed18-4dde-a376-32ff921b8783
+                    service_id: 11fa72a4-7a85-11ec-b13e-f02f7488d897
+                    room_id: e07e5bc4-2bf9-11ec-910f-2c4d546557dd
+                    resources:
+                    - e07e5bc4-8bf9-11ec-910f-2c4d546557dd
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      summary: Создать аренду зала {interval_rental}
+      operationId: interval_rental
+      description: Метод осуществляет аренду помещения и возвращает структуру с данными
+        о созданной аренде. Отличается от метода [{rental}](#operation/post_rental)
+        тем, что принимает сразу несколько интевалов для создания аренды. В результате
+        выполнения может быть создано несколько занятий
+      tags:
+      - Аренда зала
+      parameters:
+      - name: usertoken
+        in: header
+        description: Ключ клиента
+        required: true
+        schema:
+          type: string
+        example: 580392-e6ba49428-0ac67fcd-f2180121
+      requestBody:
+        content:
+          application/json:
+            example:
+              record_array:
+              - date_time: '2022-02-08T11:30:00'
+                duration: 15
+                rental_id: f2adaa8f-6cb4-11ed-b167-f02f7488d897
+              - date_time: '2022-02-08T11:45:00'
+                duration: 15
+                rental_id: e07e5bc4-8bf9-11ec-910f-2c4d546557dd
+              - date_time: '2022-02-08T12:30:00'
+                duration: 15
+                rental_id: 885fa908-ed18-4dde-a376-32ff921b8783
+              service_id: a503fa44-366a-11ec-b135-f02f7488d897
+              room_id: e07e5bc4-2bf9-11ec-910f-2c4d546557dd
+              locker_room_id: f2adaa8f-6cb4-11ed-b167-f02f7488d897
+              resources:
+              - e07e5bc4-8bf9-11ec-910f-2c4d546557dd
+            schema:
+              type: object
+              properties:
+                rental_id:
+                  type: string
+                  description: Идентификатор аренды. Если передаётся этот параметр,
+                    то остальные параметры не требуются
+                ticket_id:
+                  type: string
+                  description: Идентификатор основания оплаты
+                service_id:
+                  type: string
+                  description: Идентификатор услуги
+                room_id:
+                  type: string
+                  description: Идентификатор помещения
+                locker_room_id:
+                  type: string
+                  description: Идентификатор раздевалки
+                record_array:
+                  $ref: '#/components/schemas/RecordRental'
+                  description: Массив структур с временными интервалами
+                resources:
+                  type: array
+                  items: {}
+                  description: Массив идентификаторов арендуемых ресурсов
+  /hs/api/v3/types_coating/:
+    get:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    $ref: '#/components/schemas/ResultResponse'
+                  data:
+                    type: array
+                    items:
+                      description: Покрытие помещения
+                      type: object
+                      properties:
+                        id:
+                          $ref: '#/components/schemas/ID'
+                        title:
+                          $ref: '#/components/schemas/Title'
+                        color:
+                          type: string
+                          description: Цвет (#FFFFFF)
+              example:
+                result: true
+                data:
+                - id: 1272ad8a-f76b-11ea-89de-2c4d546557dd
+                  title: Покрытие 1
+                  color: '#A0A0A0'
+                - id: a7591f1c-f75f-11ea-89de-2c4d546557dd
+                  title: Покрытие 1
+                  color: '#A0A0A0'
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      summary: Получить список типов покрытий {types_coating}
+      operationId: types_coating
+      description: Метод возвращает массив типов покрытий для аренды.
+      tags:
+      - Аренда зала
+  /hs/api/v3/types_location/:
+    get:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    $ref: '#/components/schemas/ResultResponse'
+                  data:
+                    type: array
+                    items:
+                      description: Локация помещения
+                      type: object
+                      properties:
+                        id:
+                          $ref: '#/components/schemas/ID'
+                        title:
+                          $ref: '#/components/schemas/Title'
+                        color:
+                          type: string
+                          description: Цвет (#FFFFFF)
+              example:
+                result: true
+                data:
+                - id: 1272ad8a-f76b-11ea-89de-2c4d546557dd
+                  title: Локация 1
+                  color: '#A0A0A0'
+                - id: a7591f1c-f75f-11ea-89de-2c4d546557dd
+                  title: Локация 1
+                  color: '#A0A0A0'
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      summary: Получить список локаций {types_location}
+      operationId: types_location
+      description: Метод возвращает массив локаций для аренды.
+      tags:
+      - Аренда зала
+  /hs/api/v3/types_rooms/:
+    get:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    $ref: '#/components/schemas/ResultResponse'
+                  data:
+                    type: array
+                    items:
+                      description: Локация помещения
+                      type: object
+                      properties:
+                        id:
+                          $ref: '#/components/schemas/ID'
+                        title:
+                          $ref: '#/components/schemas/Title'
+              example:
+                result: true
+                data:
+                - id: 1272ad8a-f76b-11ea-89de-2c4d546557dd
+                  title: Локация 1
+                - id: a7591f1c-f75f-11ea-89de-2c4d546557dd
+                  title: Локация 1
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      summary: Получить список типов помещений {types_rooms}
+      operationId: types_rooms
+      description: Метод возвращает массив типов помещений для аренды.
+      tags:
+      - Аренда зала
+  /hs/api/v3/visits_history:
+    get:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    $ref: '#/components/schemas/ResultResponse'
+                  data:
+                    description: Данные ответа
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          description: Идентификатор посещения
+                          $ref: '#/components/schemas/ID'
+                        start_date:
+                          $ref: '#/components/schemas/StartDate'
+                        end_date:
+                          $ref: '#/components/schemas/EndDate'
+                        is_visit:
+                          description: Посещение состоялось (клиент находился в клубе)
+                          type: boolean
+                        appointment_list:
+                          description: Массив занятий клиента
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              appointment_id:
+                                description: Идентификатор занятия
+                                $ref: '#/components/schemas/ID'
+                              type:
+                                description: 'Тип занятия: <ul><li> personal - персональное
+                                  </li><li>classes - групповое</li></ul>'
+                                type: string
+                              status:
+                                description: 'Статус занятия: <ul><li> planned - запланировано
+                                  </li><li> canceled - отменено </li><li> ended -
+                                  проведено</li><li>passes - проводится</li></ul>'
+                                type: string
+                              start_date:
+                                $ref: '#/components/schemas/StartDate'
+                              end_date:
+                                $ref: '#/components/schemas/EndDate'
+                              duration:
+                                description: Продолжительность занятия в минутах
+                                type: number
+                              count:
+                                description: Количество услуг в занятии
+                                type: number
+                              arrival_status:
+                                description: 'Статус прибытия клиента: <ul><li> arrived
+                                  - прибыл</li><li>not_arrived - не прибыл</li><li>canceled
+                                  - отменил</li>'
+                                type: string
+                              service:
+                                description: Услуга занятия
+                                $ref: '#/components/schemas/IDTitle'
+                              room:
+                                description: Помещение
+                                $ref: '#/components/schemas/IDTitle'
+                              employee:
+                                description: Сотрудник занятия
+                                type: object
+                                properties:
+                                  name:
+                                    description: ФИО сотрудника
+                                    type: string
+                                    example: Иванов Иван Иванович
+                                  id:
+                                    $ref: '#/components/schemas/ID'
+                                  position:
+                                    description: Должность сотрудника
+                                    $ref: '#/components/schemas/IDTitle'
+                              resources:
+                                description: Ресурсы помещения в занятии
+                                type:
+                                - array
+                                - 'null'
+                                items:
+                                  $ref: '#/components/schemas/IDTitle'
+                              ratings:
+                                type:
+                                - object
+                                - 'null'
+                                description: Структура оценки. Null если занятие не
+                                  оценено
+                                properties:
+                                  rating:
+                                    description: Оценка занятия
+                                    type: number
+                                  comment:
+                                    description: Комментарий занятия
+                                    type: string
+                  club:
+                    description: Структура клуба
+                    $ref: '#/components/schemas/IDTitle'
+                  pagination_response:
+                    $ref: '#/components/schemas/PaginationResponse'
+              example:
+                result: true
+                data:
+                - id: 32ca84d2-ac8e-11e9-8979-049226ced5e4
+                  start_date: 2019-07-22 15:30
+                  end_date: 2019-07-22 17:00
+                  appointment_list:
+                  - appointment_id: a90963b9-93fa-4288-b448-a0604b70bc02
+                    type: classes
+                    status: ended
+                    start_date: 2019-07-22 15:30
+                    end_date: 2019-07-22 17:00
+                    duration: 90
+                    count: 1
+                    arrival_status: arrived
+                    service:
+                      title: Бокс
+                      id: 826e6573-178d-11e3-9c85-e83935edba9b
+                    room:
+                      title: Большой зал
+                      id: a001c5f8-f8c5-11e1-bd50-3860779088bc
+                    employee:
+                      name: Иванов Сергей Анатольевич
+                      id: db3f275a-bb00-11e7-9bcd-3085a98f71a0
+                      position:
+                        title: null
+                        id: null
+                    resources:
+                    - title: Правая половина
+                      id: a001c5f8-f8c5-11e1-bd50-3860779088bc
+                    ratings:
+                      rating: 5
+                      comment: Отличное занятие
+                club:
+                  id: 9efcd44b-272f-11e6-bf79-3085a98f71a0
+                  title: SPA Салон
+                pagination_response:
+                  requested_offset: 39
+                  page_size: 20
+                  total_results: 44
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      summary: Получить историю посещений клиента {visits_history}
+      operationId: visits_history
+      description: 'Метод возвращает массив данных, содержащий информацию о посещениях
+        клуба клиентом.  <br> Приоритет второстепенных параметров:  <br> 1. `service_id`  <br>
+        2. `type`'
+      tags:
+      - Клиенты
+      parameters:
+      - name: service_id
+        in: query
+        description: Идентификатор услуги
+        schema:
+          type: string
+      - name: requested_offset
+        in: query
+        description: Смещение выгрузки. По умолчанию 0.
+        schema:
+          type: string
+      - name: page_size
+        in: query
+        description: Размер выгрузки (не больше 30). По умолчанию 30.
+        schema:
+          type: string
+      - name: club_id
+        in: query
+        description: Идентификатор структурной единицы.(Если не передать, берется
+          первый из внешней системы)
+        schema:
+          type: string
+      - name: order
+        in: query
+        description: 'Сортировка: DESC, ASC'
+        example: DESC
+        schema:
+          type: string
+      - name: usertoken
+        in: header
+        description: Ключ клиента
+        required: true
+        schema:
+          type: string
+        example: 580392-e6ba49428-0ac67fcd-f2180121
+  /hs/api/v3/videos/:
+    get:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    $ref: '#/components/schemas/ResultResponse'
+                  data:
+                    type: array
+                    items:
+                      description: Видео
+                      type: object
+                      properties:
+                        appointment_id:
+                          $ref: '#/components/schemas/ID'
+                        share_url:
+                          type: string
+                          description: Ссылка на видео
+                        embed_url:
+                          type: string
+                          description: Ссылка на скачивание
+                        duration:
+                          type: number
+                          description: Длительность видео
+                  pagination:
+                    type: object
+                    description: Структура пагинации
+                    properties:
+                      requested_offset:
+                        type: number
+                        description: Смещение выгрузки
+                      page_size:
+                        type: number
+                        description: Размер выгрузки
+                      total_results:
+                        type: number
+                        description: Количество занятий всего
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      summary: Получить список видео {videos}
+      operationId: videos
+      description: Метод возвращает список видео
+      tags:
+      - Видео
+      parameters:
+      - name: start_date
+        in: query
+        description: Дата начала периода
+        schema:
+          type: string
+      - name: end_date
+        in: query
+        description: Дата окончания периода
+        schema:
+          type: string
+      - name: requested_offset
+        in: query
+        description: Смещение
+        schema:
+          type: number
+      - name: page_size
+        in: query
+        description: Размер страницы
+        schema:
+          type: number
+      - name: order
+        in: query
+        description: Сортировка (ASC/DESC)
+        schema:
+          type: string
+  /hs/api/v3/video/:
+    get:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    $ref: '#/components/schemas/ResultResponse'
+                  data:
+                    type: object
+                    properties:
+                      appointment_id:
+                        $ref: '#/components/schemas/ID'
+                      share_url:
+                        type: string
+                        description: Ссылка на видео
+                      embed_url:
+                        type: string
+                        description: Ссылка на скачивание
+                      duration:
+                        type: number
+                        description: Длительность видео
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      summary: Получить видео занятия {video}
+      operationId: video
+      description: Получить видео занятия
+      tags:
+      - Видео
+      parameters:
+      - name: appointment_id
+        in: query
+        description: Идентификатор занятия
+        schema:
+          type: string
+  /apicoach/infoSearchTrainer:
+    get:
+      summary: Получить информацию о номенклатуре поиска тренера
+      operationId: infoSearchTrainer
+      description: Метод возвращает наименование номенклатуры и ее цену для услуги
+        поиска тренера.
+      tags:
+      - Информация о номенклатуре
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    description: Признак успешного выполнения запроса
+                  data:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        description: Наименование номенклатуры
+                      price:
+                        type: string
+                        description: Цена номенклатуры
+                    required:
+                    - name
+                    - price
+                required:
+                - result
+                - data
+              example:
+                result: true
+                data:
+                  name: Поиск тренера
+                  price: "1500.5"
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    apiKey:
+      type: apiKey
+      in: header
+      name: apikey
+      description: 'Ключ приложения (Example: **110132e6-ba129-4120-ac33-fcd612380121**)'
+    userToken:
+      type: apiKey
+      in: header
+      name: usertoken
+      description: Ключ клиента
+    tokenMaster:
+      type: apiKey
+      in: header
+      name: token_master
+      description: Ключ родственника
+  schemas:
+    AuthorizationError:
+      description: Ошибка авторизации
+      type: object
+      properties:
+        result:
+          type: boolean
+          description: Результат запроса
+          default: false
+        data:
+          type: string
+      required:
+      - result
+      - data
+    BadRequest:
+      description: Некорректный запрос
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultResponse'
+        error:
+          type: number
+          description: Код ошибки
+        error_message:
+          type: string
+          description: Описание ошибки
+      required:
+      - result
+      - error
+      - error_message
+      example:
+        result: false
+        error: 1063
+        error_message: Неверный ключ авторизации внешнего приложения
+    InternalServerError:
+      description: Внутренняя ошибка сервера
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/ResultResponse'
+        error:
+          type: number
+          description: Код ошибки
+        error_message:
+          type: string
+          description: Описание ошибки
+      required:
+      - result
+      - error
+      - error_message
+      example:
+        result: false
+        error: 9999
+        error_message: Произошла внутренняя ошибка...
+    ResultResponse:
+      default: true
+      description: 'Результат запроса
+
+        - true
+
+        - false
+
+        '
+    IDTitle:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ID'
+        title:
+          $ref: '#/components/schemas/Title'
+      required:
+      - id
+      - title
+    ID:
+      description: Идентификатор объекта
+      type: string
+      format: uuid
+      example: 689c34d8-79ee-11ec-b13e-f02f7488d897
+      x-nullable: true
+    Title:
+      type: string
+      example: Наменование элемента
+      description: Наименование
+    RoomObject:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ID'
+        title:
+          $ref: '#/components/schemas/Title'
+        description:
+          description: Описание помещения
+          type: string
+        photo:
+          type: string
+          description: Изображение зала
+          x-nullable: true
+        capacity:
+          description: Вместимость
+          type: string
+          x-nullable: true
+        area:
+          description: Площадь
+          type: string
+          x-nullable: true
+        resources_used:
+          description: В помещении используются ресурсы
+          type: boolean
+        pictures:
+          type: array
+          description: Изображения зала
+          x-nullable: true
+        sort_order:
+          type: integer
+          description: Индекс сортировки зала
+          x-nullable: true
+        type:
+          description: Тип помещения
+          $ref: '#/components/schemas/IDTitle'
+        location:
+          description: Локация помещения
+          type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/ID'
+            title:
+              $ref: '#/components/schemas/Title'
+            color:
+              type: string
+              description: Цвет (#FFFFFF)
+        coating:
+          description: Покрытие помещения
+          type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/ID'
+            title:
+              $ref: '#/components/schemas/Title'
+            color:
+              type: string
+              description: Цвет (#FFFFFF)
+        price:
+          type: number
+          description: Минимальная стоимость услуг в помещении
+          x-nullable: true
+        included:
+          type: boolean
+          description: Параметр используемый в раздевалках. true если раздевалка доступна
+            клиенту бесплатно (включена в членство)
+          x-nullable: true
+        service_id:
+          type: string
+          description: 'Идентификатор (UUID) услуги по улучшению/аренде раздевалки (номенклатуры), если к помещению привязана услуга'
+          x-nullable: true
+        resources:
+          type: array
+          description: Дерево ресурсов помещения. Возвращается, если 'resources_used'
+            = true
+        items:
+          type: object
+          properties:
+            resource:
+              type: object
+              properties:
+                id:
+                  type: string
+                title:
+                  type: string
+            included_resources:
+              type: array
+              items:
+                type: object
+                properties:
+                  resource:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      title:
+                        type: string
+                  included_resources:
+                    type: array
+                    items: {}
+                required:
+                - resource
+                - included_resources
+          required:
+          - resource
+          - included_resources
+      required:
+      - id
+      - title
+    RentalSchedule:
+      type: array
+      items:
+        type: object
+        properties:
+          day:
+            type: integer
+            description: День недели
+          times:
+            type: array
+            description: Временные интервалы
+            items:
+              type: object
+              properties:
+                time_start:
+                  description: Начало интервала
+                  type: string
+                time_end:
+                  description: Конец интервала
+                  type: string
+                duration:
+                  description: Длительность
+                  type: integer
+    RentalScheduleTimes:
+      type: array
+      items:
+        type: object
+        properties:
+          day:
+            type: integer
+            description: День недели
+          times:
+            type: array
+            description: Временные интервалы
+            items:
+              type: string
+    cart:
+      type: object
+      required:
+      - purchase_id
+      - count
+      properties:
+        purchase_id:
+          type: string
+          description: Идентификатор номенклатуры
+        count:
+          type: number
+          description: Количество номенклатуры
+        price_type_id:
+          type: string
+          description: Идентификатор вида цен. Его можно получить из метода "employee_choice".
+            Если не указан, то вид цен будет браться из настроек внешней системы
+        employee_id:
+          type: string
+          description: Идентификатор сотрудника
+        course_id:
+          type: string
+          description: Идентификатор секции
+        cycle_period_id:
+          type: string
+          description: Идентификатор периода цикла
+        start_date:
+          type: string
+          description: Дата время начала записи
+        ticket_id:
+          type: string
+          description: Идентификатор членств/пакетов услуг (передается при покупке
+            модификаторов)
+        service_id:
+          type: string
+          description: Идентификатор услуги (передается при покупке основания для
+            записи в занятие)
+        activation_date:
+          type: string
+          description: Дата активации пакета услуг
+    paymentInfo:
+      type: object
+      properties:
+        approval_code:
+          type: string
+          description: Эквайринг код авторизации
+        auth_ref_num:
+          type: string
+          description: Эквайринг ссылочный номер
+        card_num:
+          type: string
+          description: Эквайринг номер платежной карты
+    PaymentList:
+      type: object
+      required:
+      - type
+      - amount
+      properties:
+        type:
+          type: string
+          description: Тип оплаты ("cash" - оплата наличными, "card" - оплата картой,
+            "deposit" - оплата с лицевого счета, "bonus" - оплата с бонусного счета)
+        amount:
+          type: number
+          description: Сумма оплаты
+        id:
+          type: string
+          description: Идентификатор лицевого (бонусного) счета (необходимо передавать
+            только при оплате с лицевого (бонусного) счета)
+    RecordRental:
+      type: object
+      required:
+      - date_time
+      properties:
+        date_time:
+          type: string
+          description: 'Дата и время занятия. Пример: "2022-02-08T11:30:00"'
+        duration:
+          type: number
+          description: Длительность интервала в минутах (по умолчанию берётся из нормы
+            времени услуги).
+        rental_id:
+          description: Идентификатор занятия, которое будет оплачено
+          $ref: '#/components/schemas/ID'
+        optional_services:
+          type: array
+          description: Мaccив с доп.услугами
+          items:
+            type: object
+            required:
+            - service_id
+            properties:
+              service_id:
+                $ref: '#/components/schemas/ID'
+                description: Идентификатор доп.услуги
+              count:
+                type: integer
+                description: Количество покупаемых услуг (при покупке персональной
+                  услуги можно не передавать)
+              employee_id:
+                $ref: '#/components/schemas/ID'
+                description: Идентификатор сотрудника, проводящего персональную тренировку
+    PaginationResponse:
+      description: Структура пагинации
+      type: object
+      properties:
+        requested_offset:
+          description: Смещение выгрузки
+          type: number
+        page_size:
+          description: Размер выгрузки
+          type: number
+        total_results:
+          description: Общее количество объектов
+          type: number
+    StartDate:
+      description: Дата начала (yyyy-mm-dd HH:MM)
+      type: string
+      format: date-time
+      example: '2026-02-01T00:00:00'
+    EndDate:
+      description: Дата окончания (yyyy-mm-dd HH:MM)
+      type: string
+      format: date-time
+      example: '2026-02-01T00:00:00'
+    CartRental:
+      type: object
+      required:
+      - record_array
+      - service_id
+      - room_id
+      properties:
+        record_array:
+          $ref: '#/components/schemas/RecordRental'
+          description: Массив с интервалами записи
+        service_id:
+          type: string
+          description: Идентификатор услуги
+        room_id:
+          type: string
+          description: Идентификатор помещения
+        resources:
+          description: Массив идентификаторов ресурсов
+          type: array
+          items:
+            $ref: '#/components/schemas/ID'
