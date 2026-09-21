@@ -1191,6 +1191,14 @@ paths:
                 mass_booking:
                   type: boolean
                   description: Признак массовой аренды. Обязателен при массовом бронировании
+                success_url:
+                  type: string
+                  description: URL-адрес для возврата пользователя на сайт/виджет в случае успешной оплаты
+                  example: https://tennis.luzhniki.ru/booking/success
+                fail_url:
+                  type: string
+                  description: URL-адрес для возврата пользователя в случае ошибки или отмены оплаты
+                  example: https://tennis.luzhniki.ru/booking/fail
   /hs/api/v3/appointment_trainers_v2/:
     get:
       responses:
