@@ -953,7 +953,7 @@ paths:
         - `locker_room_id` — ID (UUID) услуги улучшения раздевалки (поле `service_id` из метода `locker_rooms`) ЛИБО ID помещения сьюта (поле `id` из метода `locker_rooms`). При передаче ID помещения 1С автоматически сопоставляет его с нужной услугой улучшения.
         - `locker_room_count` — количество запрашиваемых раздевалок (1 или 2). По умолчанию: 1.
         Метод автоматически подбирает свободные раздевалки указанной услуги (приоритетно в той же локации, что и корт) и сохраняет их в регистре брони.
-        После успешной оплаты брони в структуре занятия возвращается сьют `locker_room`, статус ключа `locker_key_issued` (false - если ключ ожидает выдачи на рецепции) и сообщение `locker_key_message` ("Ключ от раздевалки необходимо получить на рецепции клуба").
+        После успешной оплаты брони в структуре занятия возвращается массив раздевалок `locker_rooms` (и алиас `locker_room`), общий статус ключей `locker_key_issued` (false - если ключи ожидают выдачи на рецепции) и сообщение `locker_key_message`.
       tags:
       - Аренда зала
       parameters:
@@ -1826,15 +1826,41 @@ paths:
                               room:
                                 description: Помещение
                                 $ref: '#/components/schemas/IDTitle'
+                              locker_rooms:
+                                description: Список забронированных раздевалок / сьютов
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: Идентификатор помещения раздевалки
+                                    title:
+                                      type: string
+                                      description: Наименование раздевалки
+                                    key_issued:
+                                      type: boolean
+                                      description: Флаг выдачи физического ключа/карты СКУД от данной раздевалки (true - выдан, false - ожидает выдачи на рецепции)
                               locker_room:
-                                description: Арендованная раздевалка / сьют (если забронирован)
-                                $ref: '#/components/schemas/IDTitle'
-                                x-nullable: true
+                                description: Массив забронированных раздевалок / сьютов (алиас поля locker_rooms)
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: Идентификатор помещения раздевалки
+                                    title:
+                                      type: string
+                                      description: Наименование раздевалки
+                                    key_issued:
+                                      type: boolean
+                                      description: Флаг выдачи физического ключа/карты СКУД от данной раздевалки (true - выдан, false - ожидает выдачи на рецепции)
                               locker_key_issued:
-                                description: Флаг выдачи физического ключа/карты СКУД от раздевалки (true - выдан, false - ожидает выдачи на рецепции)
+                                description: Флаг выдачи физического ключа/карты СКУД от всех забронированных раздевалок (true - все выданы, false - ожидает выдачи на рецепции)
                                 type: boolean
                               locker_key_message:
-                                description: Текст сообщения для клиента, если ключ еще не выдан
+                                description: Текст сообщения для клиента, если хотя бы один ключ еще не выдан
                                 type: string
                                 example: Ключ от раздевалки необходимо получить на рецепции клуба
                               employee:
