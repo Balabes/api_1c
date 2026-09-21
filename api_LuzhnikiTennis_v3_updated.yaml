@@ -1922,6 +1922,16 @@ paths:
                     room:
                       title: Большой зал
                       id: a001c5f8-f8c5-11e1-bd50-3860779088bc
+                    locker_rooms:
+                    - id: 445e1400-013f-11f1-8939-0050568b5c63
+                      title: Сьют №1
+                      key_issued: false
+                    locker_room:
+                    - id: 445e1400-013f-11f1-8939-0050568b5c63
+                      title: Сьют №1
+                      key_issued: false
+                    locker_key_issued: false
+                    locker_key_message: Ключ от раздевалки необходимо получить на рецепции клуба
                     employee:
                       name: Иванов Сергей Анатольевич
                       id: db3f275a-bb00-11e7-9bcd-3085a98f71a0
