@@ -2200,6 +2200,235 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
+  /booking/getSchedule:
+    get:
+      summary: Получить интервалы для создания аренды
+      operationId: booking_getSchedule
+      description: Метод возвращает доступные интервалы для создания аренды.
+      tags:
+      - Бронирование
+      parameters:
+      - name: clubID
+        in: query
+        description: Идентификатор структурной единицы
+        required: true
+        schema:
+          type: string
+      - name: personID
+        in: query
+        description: Идентификатор клиента (user token)
+        required: true
+        schema:
+          type: string
+      - name: subPlaygroundID
+        in: query
+        description: Идентификатор помещения
+        required: true
+        schema:
+          type: string
+      - name: serviceID
+        in: query
+        description: Идентификатор услуги
+        required: true
+        schema:
+          type: string
+      - name: start
+        in: query
+        description: Дата начала в формате ISO 8601
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: end
+        in: query
+        description: Дата окончания в формате ISO 8601
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: countPlayers
+        in: query
+        description: Количество клиентов
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    date:
+                      type: string
+                      format: date
+                    times:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          timeStart:
+                            type: string
+                          price:
+                            type: number
+                          currency:
+                            type: string
+                          status:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              name:
+                                type: string
+                          duration:
+                            type: integer
+              example: []
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /hs/api/v3/rental_cart_cost/:
+    get:
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    $ref: '#/components/schemas/ResultResponse'
+                  data:
+                    $ref: '#/components/schemas/CartCost'
+              example:
+                result: true
+                data:
+                  cart:
+                  - purchase:
+                      id: 37515859-3721-11ec-b135-f02f7488d897
+                      title: Аренда с тарификацией (час)
+                    count: 3
+                    price_type:
+                      id: 849233e6-2bf5-11ec-910f-2c4d546557dd
+                      title: Розничная цена
+                    price: 6
+                    price_with_discount: 4.8
+                    discount_sum: 3.6
+                    payment_amount: 14.4
+                    vat: null
+                    tax_sum: 0.87
+                  total_amount: 14.4
+                  total_discount: 3.6
+                  total_deposit: 0
+                  may_be_payment:
+                  - id: 11da9123-6cc0-11ed-b167-f02f7488d897
+                    title: Бонусный, Орлов Тест Александрович
+                    type: bonus
+                    payment_amount: 14.4
+                  promotions:
+                  - type: discount
+                    title: Бонус 5% от покупки
+                    amount: 0.48
+                  - type: discount
+                    title: Скидка 20%
+                    amount: 2.4
+                  - type: discount
+                    title: Бонус 5% от покупки
+                    amount: 0.24
+                  - type: discount
+                    title: Скидка 20%
+                    amount: 1.2
+                  use_sberbank_fiscalization: false
+                  client:
+                    full_name: Орлов Тест Александрович
+                    email: test@mail.ru
+                  org_id: 849235b5-2bf5-11ec-910f-2c4d546557dd
+                  club_id: 849235b6-2bf5-11ec-910f-2c4d546557dd
+                  deposit_sufficient: true
+                  deposit_top_up_amount: 0.0
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Ошибка авторизации
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+      summary: Рассчитать стоимость аренды {rental_cart_cost}
+      operationId: rental_cart_cost
+      description: Метод рассчитывает стоимость аренды с учетом выбранных интервалов,
+        услуг, скидок и доступных способов оплаты.
+      tags:
+      - Аренда
+      parameters:
+      - name: cart
+        in: query
+        description: "Строка Json с массивом структур, содержащих параметры:\n - **\"\
+          service_id\"** (идентификатор номенклатуры)\n - **\"room_id\"** (идентификатор\
+          \ помещения)\n - **\"record_array\"** (структура с интервалами для расчета,\
+          \ возвращается в методе [{interval_rental}](#operation/interval_rental))\n\
+          \  - **date_time** - Время записи\n  - **duration** - Длительность\n  -\
+          \ **rental_id** - Идентификатор аренды\n  - **optional_services**: - Дополнительные\
+          \ услуги\n    - **service_id** - Идентификатор услуги\n    - **count** -\
+          \ количество\n    - **employee_id** - Идентификатор сотрудника (если это\
+          \ персональное занятие)\n - **cart_pay** (структура с передаваемыми оплатами,\
+          \ если не указан, в структура возврата не будет структуры \"cart_pay\")\n\
+          \n\nПример такой строки:\n{\"cart_array\":[{\"record_array\": [{\"date_time\"\
+          : \"2023-02-27 19:00:00\",\"duration\": 120, \"rental_id\": \"04e58135-05a0-11f1-b20b-001a7dda7115\"\
+          , \"optional_services\": [{\"service_id\":\"ee176080-5bbe-11ef-b1c6-001a7dda7115\"\
+          ,\"count\":1},{\"service_id\":\"ad0b3d26-a51e-11f0-b1fe-001a7dda7115\",\"\
+          count\":1,\"employee_id\":\"3b680210-2d51-11ee-b18e-f02f7488d897\"}]},{\"\
+          date_time\": \"2023-02-27 22:00:00\",\"duration\": 60}],\"service_id\":\
+          \ \"37515859-3721-11ec-b135-f02f7488d897\",\"room_id\": \"e07e5bc4-2bf9-11ec-910f-2c4d546557dd\"\
+          }], \"cart_pay\":{\"pay_deposit\":[{\"id\":\"cb0a9cab-bb83-11ee-b1a3-f02f7488d897\"\
+          ,\"val\":\"11600\"},{\"id\":\"f9c4beff-bb86-11ee-b1a3-f02f7488d897\",\"\
+          val\":\"\"}],\"pay_bonus\":null,\"pay_certificate\":null}}\n"
+        required: true
+        schema:
+          type: string
+      - name: club_id
+        in: query
+        description: Идентификатор структурной единицы
+        required: true
+        schema:
+          type: string
+      - name: promocode
+        in: query
+        description: Промокод
+        schema:
+          type: string
+        example: test
+      - name: usertoken
+        in: header
+        description: Ключ клиента
+        required: false
+        schema:
+          type: string
+        example: 7e8245d1-574f-4ce8-88ec-7e34358df45              
 components:
   securitySchemes:
     basicAuth:
@@ -2593,3 +2822,234 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ID'
+    VAT:
+      type: string
+      x-nullable: true
+      description: '"Ставка НДС":
+
+        - 0 - Без НДС
+
+        - 1 - Ставка 0
+
+        - 2 – НДС чека по ставке 10%
+
+        - 3 – НДС чека по ставке 18%
+
+        - 4 – НДС чека по расчётной ставке 10/110
+
+        - 5 – НДС чека по расчётной ставке 18/118
+
+        - 6 – НДС чека по ставке 20%
+
+        - 7 – НДС чека по расчётной ставке 20/120
+
+        - 8 - НДС чека по ставке 5%
+
+        - 9 - НДС чека по ставке 5/105
+
+        - 10 - НДС чека по ставке 7%
+
+        - 11 - НДС чека по ставке 7/107%
+
+        - 12 - НДС чека по ставке 22%
+
+        - 13 - НДС чека по ставке 22/122
+
+        '
+    MayBePayment:
+      description: Массив возможных оплат
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            $ref: '#/components/schemas/ID'
+          title:
+            $ref: '#/components/schemas/Title'
+          type:
+            description: 'Тип оплаты:
+
+              - deposit - Лицевой счет
+
+              - bonus - Бонусный счет
+
+              - certificate - Сертификат
+
+              - card - Карта (если оплата платежной связкой необходимо передать id
+              связки)
+
+              '
+            type: string
+          payment_amount:
+            description: Максимально доступная сумма оплаты
+            type: number
+          balance:
+            description: Баланс счета
+            type: number
+    CartCost:
+      description: Структура корзины
+      type: object
+      properties:
+        cart:
+          description: Массив данных приобретаемых номекнлатур
+          type: array
+          items:
+            type: object
+            properties:
+              purchase:
+                description: Структура номенклатуры
+                $ref: '#/components/schemas/IDTitle'
+              count:
+                description: Приобретаемое количество
+                type: number
+              price_type:
+                description: Структура вида цен
+                $ref: '#/components/schemas/IDTitle'
+              price:
+                description: Цена
+                type: number
+              price_with_discount:
+                description: Цена со скидкой
+                type: number
+              discount_sum:
+                description: Сумма скидки
+                type: number
+              payment_amount:
+                description: Итоговая сумма оплаты по номенклатуре
+                type: number
+              vat:
+                $ref: '#/components/schemas/VAT'
+              tax:
+                description: Ставка НДС с учетом типа фискализации (меняется в зависимости
+                  от используемого банка)
+                $ref: '#/components/schemas/VAT'
+              tax_sum:
+                description: Сумма НДС
+                type: number
+              payment_object:
+                description: Признак предмета расчета
+                type: string
+              payment_method:
+                description: Способ предмета расчета
+                type: string
+              max_purchase_count:
+                description: Максимальное количество к покупке. null- нет ограничений
+                type: number
+              course_id:
+                description: Идентификатор секции
+                $ref: '#/components/schemas/ID'
+              cycle_period_id:
+                description: Идентификатор цикла периода секции
+                $ref: '#/components/schemas/ID'
+              activation_date:
+                description: Дата активации ЧПУ
+                type: string
+              ticket_id:
+                description: Идентификатор ЧПУ
+                $ref: '#/components/schemas/ID'
+              service_id:
+                description: Идентификатор услуги записи (передается при просчете
+                  корзины с занятия)
+                $ref: '#/components/schemas/ID'
+              employee_id:
+                description: Идентификатор сотрудника
+                $ref: '#/components/schemas/ID'
+              appointment_id:
+                description: Идентификатор занятия
+                $ref: '#/components/schemas/ID'
+              appointment:
+                description: Детальная информация занятия
+                type: object
+                properties:
+                  start_date:
+                    description: Дата и время начала занятия
+                    type: string
+                  end_date:
+                    description: Дата и время окончания занятия
+                    type: string
+                  service:
+                    description: Номенклатура занятия
+                    $ref: '#/components/schemas/IDTitle'
+                  room:
+                    description: Помещение занятия
+                    $ref: '#/components/schemas/IDTitle'
+              start_date:
+                description: Дата и время начала занятия (используется при записи)
+                type: string
+              employee_choice_required:
+                description: Необходим выбор сотрудника
+                type: boolean
+              course_choice_required:
+                description: Необходим выбор секции
+                type: boolean
+              cycle_periods_choice_required:
+                description: Необходим выбор периода секции
+                type: boolean
+        total_amount:
+          description: Общая сумма к оплате
+          type: number
+        total_discount:
+          description: Общая сумма скидки
+          type: number
+        total_deposit:
+          description: Общая сумма оплаты с лицевого счета
+          type: number
+        may_be_payment:
+          $ref: '#/components/schemas/MayBePayment'
+        promotions:
+          description: Массив применяемых скидок и бонусов
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                description: 'Тип скидки:
+
+                  - bonus - Бонус
+
+                  - discount - Скидка
+
+                  - gift - Подарок
+
+                  '
+                type: string
+              title:
+                $ref: '#/components/schemas/Title'
+              amount:
+                description: Сумма скидки
+                type: number
+            required:
+            - type
+            - title
+            - amount
+        use_sberbank_fiscalization:
+          description: Признак фискализации в банке
+          type: boolean
+        client:
+          description: Структура клиента
+          type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/ID'
+            full_name:
+              description: ФИО клиента
+              type: string
+            email:
+              description: Электронная почта
+              type: string
+            phone:
+              description: Номер телефона
+              type: string
+        org_id:
+          description: Идентификатор организации
+          $ref: '#/components/schemas/ID'
+        club_id:
+          description: Идентификатор клуба
+          $ref: '#/components/schemas/ID'
+        deposit_sufficient:
+          type: boolean
+          description: Признак того, что на лицевом счете достаточно средств для оплаты.
+        deposit_top_up_amount:
+          type: number
+          format: float
+          description: Сумма, на которую необходимо пополнить лицевой счет для оплаты.
