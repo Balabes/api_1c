@@ -1766,6 +1766,120 @@ paths:
       description: Метод возвращает массив типов помещений для аренды.
       tags:
       - Аренда зала
+  /hs/api/v3/appointments/:
+    get:
+      tags:
+      - Занятия
+      summary: Список записей клиента (appointments)
+      description: Метод возвращает список бронирований и занятий клиента с информацией о привязанных раздевалках (locker_rooms), СКУД и статусах оплаты.
+      parameters:
+      - name: appointment_id
+        in: query
+        required: false
+        schema:
+          type: string
+        description: ID конкретной записи
+      - name: type
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - classes
+          - personal
+          - rental
+        description: Тип занятия
+      - name: statuses
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Список статусов через запятую
+      - name: page_size
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 50
+        description: Размер страницы
+      - name: requested_offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 0
+        description: Смещение
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        club_id:
+                          type: string
+                        appointment_id:
+                          type: string
+                        type:
+                          type: string
+                          enum:
+                          - classes
+                          - personal
+                          - rental
+                          - visit
+                        status:
+                          type: string
+                        arrival_status:
+                          type: string
+                        payment:
+                          type: object
+                        service:
+                          type: object
+                        room:
+                          type: object
+                        employee:
+                          type: object
+                        start_date:
+                          type: string
+                          example: '2026-12-20 09:00'
+                        end_date:
+                          type: string
+                          example: '2026-12-20 11:00'
+                        duration:
+                          type: integer
+                          example: 120
+                        cost:
+                          type: number
+                        locker_rooms:
+                          type: array
+                          description: Массив привязанных раздевалок / сьютов (пустой [], если раздевалок нет)
+                          items:
+                            $ref: '#/components/schemas/LockerRoomItem'
+                        locker_key_issued:
+                          type: boolean
+                          description: Флаг выдачи физического ключа/карты СКУД от всех забронированных раздевалок (true - все выданы или раздевалок нет)
+                        locker_key_message:
+                          type: string
+                          nullable: true
+                          description: Текст сообщения для клиента, если хотя бы один ключ ожидает выдачи на рецепции
+                  pagination_response:
+                    type: object
+                    properties:
+                      requested_offset:
+                        type: integer
+                      page_size:
+                        type: integer
+                      total_results:
+                        type: integer
   /hs/api/v3/visits_history:
     get:
       responses:
@@ -1838,32 +1952,12 @@ paths:
                                 description: Список забронированных раздевалок / сьютов
                                 type: array
                                 items:
-                                  type: object
-                                  properties:
-                                    id:
-                                      type: string
-                                      description: Идентификатор помещения раздевалки
-                                    title:
-                                      type: string
-                                      description: Наименование раздевалки
-                                    key_issued:
-                                      type: boolean
-                                      description: Флаг выдачи физического ключа/карты СКУД от данной раздевалки (true - выдан, false - ожидает выдачи на рецепции)
+                                  $ref: '#/components/schemas/LockerRoomItem'
                               locker_room:
                                 description: Массив забронированных раздевалок / сьютов (алиас поля locker_rooms)
                                 type: array
                                 items:
-                                  type: object
-                                  properties:
-                                    id:
-                                      type: string
-                                      description: Идентификатор помещения раздевалки
-                                    title:
-                                      type: string
-                                      description: Наименование раздевалки
-                                    key_issued:
-                                      type: boolean
-                                      description: Флаг выдачи физического ключа/карты СКУД от данной раздевалки (true - выдан, false - ожидает выдачи на рецепции)
+                                  $ref: '#/components/schemas/LockerRoomItem'
                               locker_key_issued:
                                 description: Флаг выдачи физического ключа/карты СКУД от всех забронированных раздевалок (true - все выданы, false - ожидает выдачи на рецепции)
                                 type: boolean
@@ -3053,3 +3147,89 @@ components:
           type: number
           format: float
           description: Сумма, на которую необходимо пополнить лицевой счет для оплаты.
+    LockerRoomItem:
+      type: object
+      description: Объект забронированной раздевалки / сьюта
+      properties:
+        id:
+          type: string
+          description: Идентификатор помещения раздевалки
+          example: 7a9b1234-5678-90ab-cdef-1234567890ab
+        title:
+          type: string
+          description: Наименование раздевалки
+          example: Сьют Москва 4
+        description:
+          type: string
+          description: Описание помещения
+        start_date:
+          type: string
+          description: Дата и время начала аренды раздевалки (yyyy-MM-dd HH:mm)
+          example: '2026-12-20 09:00'
+        end_date:
+          type: string
+          description: Дата и время окончания аренды раздевалки (yyyy-MM-dd HH:mm)
+          example: '2026-12-20 10:30'
+        duration:
+          type: integer
+          description: Длительность аренды раздевалки в минутах
+          example: 90
+        price:
+          type: number
+          description: Цена услуги раздевалки
+          example: 3000
+        sum:
+          type: number
+          description: Итоговая сумма аренды раздевалки
+          example: 3000
+        is_paid:
+          type: boolean
+          description: Признак оплаты аренды раздевалки
+          example: true
+        service:
+          type: object
+          description: Услуга раздевалки
+          properties:
+            id:
+              type: string
+              description: Идентификатор услуги
+            title:
+              type: string
+              description: Наименование услуги
+        card:
+          type: object
+          nullable: true
+          description: Привязанная карта/ключ СКУД (null, если ключ еще не привязан)
+          properties:
+            id:
+              type: string
+              description: Идентификатор карты
+            code:
+              type: string
+              description: Номер/код карты
+            title:
+              type: string
+              description: Представление карты
+        key_issued:
+          type: boolean
+          description: Флаг привязки/выдачи карты СКУД (true - выдана, false - ожидает выдачи на рецепции)
+        physical_key_required:
+          type: boolean
+          description: Признак необходимости подойти на рецепцию за физическим ключом/картой
+        access_type:
+          type: string
+          enum:
+          - reception
+          - card
+          description: 'Вид доступа: reception (получить на рецепции клуба), card (выдана карта/браслет)'
+        key_message:
+          type: string
+          description: Подсказка для клиента о ключе
+      required:
+      - id
+      - title
+      - start_date
+      - end_date
+      - duration
+      - key_issued
+      - physical_key_required
