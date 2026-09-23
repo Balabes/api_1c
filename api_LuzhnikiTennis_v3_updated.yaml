@@ -1199,6 +1199,27 @@ paths:
                   type: string
                   description: URL-адрес для возврата пользователя в случае ошибки или отмены оплаты
                   example: https://tennis.luzhniki.ru/booking/fail
+                gift_to:
+                  type: object
+                  description: Данные получателя сертификата (при покупке в подарок)
+                  properties:
+                    phone:
+                      type: string
+                      description: Номер телефона получателя
+                      example: "+79991234567"
+                    name:
+                      type: string
+                      description: Имя получателя
+                      example: "Иван"
+                delayed_send_at:
+                  type: string
+                  format: date-time
+                  description: Дата и время отложенной отправки сертификата получателю (ISO 8601)
+                  example: "2026-09-25T15:00:00"
+                delay_seconds:
+                  type: integer
+                  description: Задержка отправки сертификата в секундах относительно времени оплаты
+                  example: 7200
   /hs/api/v3/appointment_trainers_v2/:
     get:
       responses:
