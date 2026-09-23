@@ -2027,10 +2027,14 @@ paths:
                     locker_rooms:
                     - id: 445e1400-013f-11f1-8939-0050568b5c63
                       title: Сьют №1
+                      photo: null
+                      pictures: []
                       key_issued: false
                     locker_room:
                     - id: 445e1400-013f-11f1-8939-0050568b5c63
                       title: Сьют №1
+                      photo: null
+                      pictures: []
                       key_issued: false
                     locker_key_issued: false
                     locker_key_message: Ключ от раздевалки необходимо получить на рецепции клуба
@@ -3162,6 +3166,15 @@ components:
         description:
           type: string
           description: Описание помещения
+        photo:
+          type: string
+          nullable: true
+          description: URL основной фотографии раздевалки
+        pictures:
+          type: array
+          description: Массив URL всех фотографий раздевалки
+          items:
+            type: string
         start_date:
           type: string
           description: Дата и время начала аренды раздевалки (yyyy-MM-dd HH:mm)
