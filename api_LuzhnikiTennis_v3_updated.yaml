@@ -1220,6 +1220,99 @@ paths:
                   type: integer
                   description: Задержка отправки сертификата в секундах относительно времени оплаты
                   example: 7200
+  /hs/api/v3/payment_link_status/:
+    get:
+      summary: Получить статус оплаты заказа {payment_link_status}
+      operationId: payment_link_status
+      description: |
+        Метод возвращает текущий статус оплаты заказа по его идентификатору `id` (полученному из `payment_link`).
+        
+        **Значения `status`:**
+        * `1` — Ожидает оплаты (в 1С: Не оплачено);
+        * `2` — Успешно оплачен (в 1С: Оплачено, сформированы Продажа и Поступление ДС);
+        * `3` — Отказ / ошибка оплаты или проведения в 1С (сопровождается полями `error`, `error_description`, `error_details`).
+      tags:
+      - Оплаты
+      parameters:
+      - name: apikey
+        in: header
+        description: API-ключ внешней системы
+        required: false
+        schema:
+          type: string
+        example: 409265d1-a0af-4ce8-88ec-7e3435024111
+      - name: id
+        in: query
+        description: Идентификатор заказа (order_id), возвращенный методом payment_link
+        required: true
+        schema:
+          type: string
+        example: 0648bd073be64aacb5d6dd48b344d24d
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    description: Признак успешного выполнения запроса
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: integer
+                        description: 'Числовой статус оплаты: 1 - ожидает оплаты, 2 - оплачен, 3 - отказ/ошибка'
+                        enum: [1, 2, 3]
+                        example: 2
+                      error:
+                        type: string
+                        description: Краткое описание ошибки (заполняется при status=3)
+                        example: "Не удалось провести: \"Продажа\"! Остатка номенклатуры на складе недостаточно."
+                      error_description:
+                        type: string
+                        description: Человекочитаемое описание причины сбоя для отображения на фронтенде
+                        example: "Заказ оплачен в банке, но произошла ошибка обработки в 1С. Пожалуйста, обратитесь к администратору."
+                      error_details:
+                        type: string
+                        description: Полные технические детали ошибки из 1С
+              examples:
+                paid:
+                  summary: Заказ успешно оплачен
+                  value:
+                    result: true
+                    data:
+                      status: 2
+                pending:
+                  summary: Ожидает оплаты
+                  value:
+                    result: true
+                    data:
+                      status: 1
+                failed:
+                  summary: Ошибка оплаты или проведения в 1С
+                  value:
+                    result: true
+                    data:
+                      status: 3
+                      error: "Не удалось провести: \"Продажа\"! Остатка \"Сертификат\" на складе недостаточно."
+                      error_description: "Не удалось провести: \"Продажа\"! Остатка \"Сертификат\" на складе недостаточно."
+                      error_details: "{\"result\":false,\"error\":2003,\"error_message\":\"Не удалось провести...\"}"
+        '400':
+          description: Некорректный запрос (например, не передан параметр id или заказ не найден)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
   /hs/api/v3/appointment_trainers_v2/:
     get:
       responses:
