@@ -2421,13 +2421,20 @@ paths:
     get:
       summary: Получить интервалы для создания аренды
       operationId: booking_getSchedule
-      description: Метод возвращает доступные интервалы для создания аренды.
+      description: |
+        Метод возвращает доступные интервалы для создания аренды.
+
+        **Особенности для аренды сьютов (раздевалок):**
+        - Если `subPlaygroundID` не передан или передан пустым, доступность определяется по пулу помещений (сьютов), привязанных к услуге `serviceID` (регистр сведений «ПомещенияДляОказанияУслуг»).
+        - Слот помечается как `Свободно` (`status.name: "Свободно"`), если в этот интервал свободен хотя бы один сьют из привязанного пула.
+        - Занятость проверяется по документу «Занятие» с учетом основного помещения (`Помещение`), а также раздевалок (`АрендаРаздевалки_905555_ПомещениеN1` и `ПомещениеN2`).
+        - Слот помечается как `Занято`, только если заняты все сьюты из привязанного пула.
       tags:
       - Бронирование
       parameters:
       - name: clubID
         in: query
-        description: Идентификатор структурной единицы
+        description: Идентификатор структурной единицы (клуба)
         required: true
         schema:
           type: string
@@ -2439,34 +2446,36 @@ paths:
           type: string
       - name: subPlaygroundID
         in: query
-        description: Идентификатор помещения
-        required: true
+        description: |
+          Идентификатор конкретного помещения (корта).
+          Для подбора сьютов параметр указывать не нужно (или передавать пустым) — система автоматически проверит доступность по всем сьютам, привязанным к услуге `serviceID`.
+        required: false
         schema:
           type: string
       - name: serviceID
         in: query
-        description: Идентификатор услуги
+        description: Идентификатор услуги аренды (для сьютов — идентификатор услуги аренды сьюта)
         required: true
         schema:
           type: string
       - name: start
         in: query
-        description: Дата начала в формате ISO 8601
+        description: Дата начала периода в формате ISO 8601 (например, 2026-11-16T00:00:00+03:00 или 2026-11-16)
         required: true
         schema:
           type: string
           format: date-time
       - name: end
         in: query
-        description: Дата окончания в формате ISO 8601
-        required: true
+        description: Дата окончания периода в формате ISO 8601 (необязательный, по умолчанию рассчитывается до конца периода бронирования)
+        required: false
         schema:
           type: string
           format: date-time
       - name: countPlayers
         in: query
-        description: Количество клиентов
-        required: true
+        description: Количество клиентов/участников (необязательный, по умолчанию 1)
+        required: false
         schema:
           type: integer
           minimum: 1
@@ -2476,34 +2485,48 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    date:
-                      type: string
-                      format: date
-                    times:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          timeStart:
-                            type: string
-                          price:
-                            type: number
-                          currency:
-                            type: string
-                          status:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                          format: date
+                          example: "2026-11-16"
+                        times:
+                          type: array
+                          items:
                             type: object
                             properties:
-                              id:
+                              timeStart:
                                 type: string
-                              name:
+                                example: "07:00"
+                              price:
+                                type: number
+                                example: 12500
+                              currency:
                                 type: string
-                          duration:
-                            type: integer
-              example: []
+                                example: "RUR"
+                              status:
+                                type: object
+                                properties:
+                                  id:
+                                    type: string
+                                    example: "6f14a9e4-d901-4f75-998e-4ae9ab9253c3"
+                                  name:
+                                    type: string
+                                    example: "Свободно"
+                              duration:
+                                type: integer
+                                description: Длительность интервала в минутах
+                                example: 120
+                  error:
+                    type: object
+                    nullable: true
+                    example: null
         '400':
           description: Некорректный запрос
           content:
