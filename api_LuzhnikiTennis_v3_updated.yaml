@@ -1587,6 +1587,19 @@ paths:
                             temporarily_reserved:
                               description: Временная бронь
                               type: boolean
+                            locker_rooms:
+                              type: array
+                              description: Массив подобранных раздевалок (сьютов)
+                              items:
+                                $ref: '#/components/schemas/LockerRoom'
+                            locker_key_issued:
+                              type: boolean
+                              description: Флаг выдачи ключа от раздевалки
+                            locker_key_message:
+                              type:
+                              - string
+                              - 'null'
+                              description: Сообщение о ключе от раздевалки
                       temporarily_reserved:
                         description: Временная бронь
                         type: boolean
@@ -1651,6 +1664,22 @@ paths:
                       - 5@mail.ru
                     status: temporarily_reserved_need_payment
                     temporarily_reserved: true
+                    locker_rooms:
+                    - id: 8e3dba61-2440-11f1-96dd-0050568b5c63
+                      title: Сьют Москва 1
+                      start_date: '2023-02-28 18:30'
+                      end_date: '2023-02-28 21:30'
+                      duration: 180
+                      price: 12500
+                      sum: 12500
+                      is_paid: false
+                      service:
+                        id: 445e1400-0139-11f1-8939-0050568b5c63
+                        title: Сьют кд
+                      key_issued: false
+                      key_message: Ключ от раздевалки необходимо получить на рецепции клуба
+                    locker_key_issued: false
+                    locker_key_message: Ключ от раздевалки необходимо получить на рецепции клуба
                   temporarily_reserved: true
                   cart:
                   - record_array:
