@@ -1591,7 +1591,7 @@ paths:
                               type: array
                               description: Массив подобранных раздевалок (сьютов)
                               items:
-                                $ref: '#/components/schemas/LockerRoom'
+                                $ref: '#/components/schemas/LockerRoomItem'
                             locker_key_issued:
                               type: boolean
                               description: Флаг выдачи ключа от раздевалки
