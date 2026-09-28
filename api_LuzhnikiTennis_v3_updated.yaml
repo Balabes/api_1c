@@ -2711,6 +2711,96 @@ paths:
         schema:
           type: string
         example: 7e8245d1-574f-4ce8-88ec-7e34358df45              
+  /hs/api/v3/convert_certificate/:
+    post:
+      summary: Зачисление средств с подарочного сертификата на лицевой счет (депозит) {convert_certificate}
+      operationId: convert_certificate
+      description: |
+        Метод переносит номинал / остаток средств с подарочного сертификата на лицевой счет (депозит) клиента и закрывает сертификат.
+
+        **Важно (настройка на стороне 1С):**
+        Для работы метода в информационной базе 1С должна быть заполнена константа:
+        **«Лицевой счет для зачисления сертификатов по умолчанию»** (`API_825553_ЛСДляЗачисленияСертификтаПоУмолчанию`).
+        Она указывает вид лицевого счета, который создается для клиента автоматически, если параметр `deposit_id` не передан в запросе или у клиента еще нет лицевого счета этого вида.
+      tags:
+      - Оплаты
+      parameters:
+      - name: club_id
+        in: query
+        description: Идентификатор структурной единицы (клуба)
+        required: true
+        schema:
+          type: string
+        example: 849235b6-2bf5-11ec-910f-2c4d546557dd
+      - name: usertoken
+        in: header
+        description: Токен клиента
+        required: true
+        schema:
+          type: string
+        example: 7e8245d1-574f-4ce8-88ec-7e34358df45
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - certificate_series
+              properties:
+                certificate_series:
+                  type: string
+                  description: (Обязательный) Серия / номер подарочного сертификата
+                  example: "CERT-2026-001"
+                deposit_id:
+                  type: string
+                  description: (Опциональный) Идентификатор (UUID) существующего лицевого счета клиента. Если не передан, зачисление выполняется на существующий подходящий счет клиента либо автоматически создается новый счет по виду из константы по умолчанию.
+                  example: "712b920a-b586-11f1-bca2-00505683a460"
+            examples:
+              example:
+                value:
+                  certificate_series: "CERT-2026-001"
+                  deposit_id: "712b920a-b586-11f1-bca2-00505683a460"
+      responses:
+        '200':
+          description: Успешное зачисление
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      deposit_id:
+                        type: string
+                        description: Идентификатор (UUID) лицевого счета, на который зачислены средства
+                        example: "712b920a-b586-11f1-bca2-00505683a460"
+                      balance:
+                        type: number
+                        description: Итоговый баланс лицевого счета после зачисления
+                        example: 1060
+              example:
+                result: true
+                data:
+                  deposit_id: "712b920a-b586-11f1-bca2-00505683a460"
+                  balance: 1060
+        '400':
+          description: Ошибка запроса (сертификат не найден, не заполнен, закрыт или некорректный счет)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
 components:
   securitySchemes:
     basicAuth:
