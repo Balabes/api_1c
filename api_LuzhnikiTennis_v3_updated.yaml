@@ -2759,7 +2759,7 @@ paths:
             examples:
               example:
                 value:
-                  certificate_series: "CERT-2026-001"
+                  certificate_series: "XIBS09I1LW"
                   deposit_id: "712b920a-b586-11f1-bca2-00505683a460"
       responses:
         '200':
