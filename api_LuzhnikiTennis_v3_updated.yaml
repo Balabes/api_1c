@@ -968,6 +968,11 @@ paths:
         description: Идентификатор помещения
         schema:
           type: string
+      - name: mass_booking
+        in: query
+        description: Признак массового бронирования
+        schema:
+          type: boolean 
       requestBody:
         content:
           application/json:
@@ -2093,6 +2098,12 @@ paths:
                         duration:
                           type: integer
                           example: 120
+                        day: 
+                          description: День недели
+                          type: integer
+                        regular_booking: 
+                          description: Признак массового бронирования
+                          type: boolean  
                         cost:
                           type: number
                         locker_rooms:
@@ -2145,6 +2156,12 @@ paths:
                         is_visit:
                           description: Посещение состоялось (клиент находился в клубе)
                           type: boolean
+                        day: 
+                          description: День недели
+                          type: integer
+                        regular_booking: 
+                          description: Признак массового бронирования
+                          type: boolean  
                         appointment_list:
                           description: Массив занятий клиента
                           type: array
@@ -2252,6 +2269,8 @@ paths:
                     start_date: 2019-07-22 15:30
                     end_date: 2019-07-22 17:00
                     duration: 90
+                    day: 1
+                    regular_booking: true
                     count: 1
                     arrival_status: arrived
                     service:
