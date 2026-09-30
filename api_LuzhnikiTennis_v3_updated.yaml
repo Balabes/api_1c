@@ -968,6 +968,11 @@ paths:
         description: Идентификатор помещения
         schema:
           type: string
+      - name: mass_booking
+        in: query
+        description: Признак массового бронирования
+        schema:
+          type: boolean 
       requestBody:
         content:
           application/json:
@@ -2093,6 +2098,12 @@ paths:
                         duration:
                           type: integer
                           example: 120
+                        day: 
+                          description: День недели
+                          type: integer
+                        regular_booking: 
+                          description: Признак массового бронирования
+                          type: boolean  
                         cost:
                           type: number
                         locker_rooms:
@@ -2145,6 +2156,12 @@ paths:
                         is_visit:
                           description: Посещение состоялось (клиент находился в клубе)
                           type: boolean
+                        day: 
+                          description: День недели
+                          type: integer
+                        regular_booking: 
+                          description: Признак массового бронирования
+                          type: boolean  
                         appointment_list:
                           description: Массив занятий клиента
                           type: array
@@ -2252,6 +2269,8 @@ paths:
                     start_date: 2019-07-22 15:30
                     end_date: 2019-07-22 17:00
                     duration: 90
+                    day: 1
+                    regular_booking: true
                     count: 1
                     arrival_status: arrived
                     service:
@@ -2641,8 +2660,9 @@ paths:
                                 description: Длительность интервала в минутах
                                 example: 120
                   error:
-                    type: object
-                    nullable: true
+                    type: 
+                    - object
+                    - "null"
                     example: null
         '400':
           description: Некорректный запрос
@@ -2656,6 +2676,64 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
+  /booking/getBookingPeriods:
+    get:
+      summary: Получить периоды массового бронирования
+      operationId: booking_getBookingPeriods
+      description: Метод возвращает список периодов, доступных для массового бронирования аренды.
+      tags:
+      - Бронирование
+      parameters:
+      - name: clubID
+        in: query
+        description: Идентификатор структурной единицы (клуба)
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    description: Массив периодов массового бронирования
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: Наименование периода
+                          example: "Период массового бронирования 1"
+                        start_date:
+                          type: string
+                          description: Дата начала периода в формате XML (ISO 8601)
+                          example: "2026-02-01T00:00:00"
+                        end_date:
+                          type: string
+                          description: Дата окончания периода в формате XML (ISO 8601)
+                          example: "2026-02-28T23:59:59"
+                  error:
+                    type: 
+                    - object
+                    - "null"
+                    description: Структура ошибки. Заполняется, если данные не найдены (Not Found)
+                    example: null
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'             
   /hs/api/v3/rental_cart_cost/:
     get:
       responses:
