@@ -2660,8 +2660,9 @@ paths:
                                 description: Длительность интервала в минутах
                                 example: 120
                   error:
-                    type: object
-                    nullable: true
+                    type: 
+                    - object
+                    - "null"
                     example: null
         '400':
           description: Некорректный запрос
@@ -2675,6 +2676,64 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
+  /booking/getBookingPeriods:
+    get:
+      summary: Получить периоды массового бронирования
+      operationId: booking_getBookingPeriods
+      description: Метод возвращает список периодов, доступных для массового бронирования аренды.
+      tags:
+      - Бронирование
+      parameters:
+      - name: clubID
+        in: query
+        description: Идентификатор структурной единицы (клуба)
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    description: Массив периодов массового бронирования
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: Наименование периода
+                          example: "Период массового бронирования 1"
+                        start_date:
+                          type: string
+                          description: Дата начала периода в формате XML (ISO 8601)
+                          example: "2026-02-01T00:00:00"
+                        end_date:
+                          type: string
+                          description: Дата окончания периода в формате XML (ISO 8601)
+                          example: "2026-02-28T23:59:59"
+                  error:
+                    type: 
+                    - object
+                    - "null"
+                    description: Структура ошибки. Заполняется, если данные не найдены (Not Found)
+                    example: null
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'             
   /hs/api/v3/rental_cart_cost/:
     get:
       responses:
