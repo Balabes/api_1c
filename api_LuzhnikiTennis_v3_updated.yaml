@@ -878,19 +878,24 @@ paths:
         required: true
         schema:
           type: string
+      - name: mass_booking
+        in: query
+        description: Признак регулярного/массового бронирования
+        schema:
+          type: boolean
       requestBody:
         content:
           application/json:
             example:
-              start_date: '2022-02-08'
-              end_date: '2022-02-08'
-              room_id: e07e5bc4-2bf9-11ec-910f-2c4d546557dd
+              start_date: '2026-11-16 00:00'
+              end_date: '2026-11-17 00:00'
+              room_id: 69a2b417-013f-11f1-8939-0050568b5c63
+              mass_booking: true
               schedule:
-              - day: 2
+              - day: 1
                 times:
-                - '15:00'
-                - '16:00'
-              locker_room_id: 445e1400-013f-11f1-8939-0050568b5c63
+                - '10:00'
+              locker_room_id: 445e1400-0139-11f1-8939-0050568b5c63
               locker_room_count: 1
             schema:
               type: object
@@ -898,6 +903,9 @@ paths:
                 room_id:
                   type: string
                   description: Идентификатор помещения корта
+                mass_booking:
+                  type: boolean
+                  description: Признак регулярного/массового бронирования
                 start_date:
                   type: string
                   description: Начало интервала
@@ -989,19 +997,15 @@ paths:
             examples:
               example:
                 value:
-                  room_id: c3c60072-1e55-11ef-b1bf-f02f7488d897
-                  start_date: 2026-02-17 00:00
-                  end_date: 2026-03-17 00:00
+                  room_id: 69a2b417-013f-11f1-8939-0050568b5c63
+                  mass_booking: true
+                  start_date: '2026-11-16 00:00'
+                  end_date: '2026-11-17 00:00'
                   schedule:
                   - day: 1
                     times:
-                    - '15:00'
-                    - '16:00'
-                  - day: 2
-                    times:
-                    - '15:00'
-                    - '16:00'
-                  locker_room_id: 445e1400-013f-11f1-8939-0050568b5c63
+                    - '10:00'
+                  locker_room_id: 445e1400-0139-11f1-8939-0050568b5c63
                   locker_room_count: 1
             schema:
               type: object
@@ -1009,6 +1013,9 @@ paths:
                 room_id:
                   type: string
                   description: Идентификатор помещения корта
+                mass_booking:
+                  type: boolean
+                  description: Признак регулярного/массового бронирования. При true удержание брони в регистре продлевается до 24 часов
                 start_date:
                   type: string
                   description: Начало интервала
