@@ -2115,8 +2115,9 @@ paths:
                           type: boolean
                           description: Флаг выдачи физического ключа/карты СКУД от всех забронированных раздевалок (true - все выданы или раздевалок нет)
                         locker_key_message:
-                          type: string
-                          nullable: true
+                          type: 
+                            - string
+                            - "null"
                           description: Текст сообщения для клиента, если хотя бы один ключ ожидает выдачи на рецепции
                   pagination_response:
                     type: object
@@ -2716,6 +2717,10 @@ paths:
                           type: string
                           description: Дата окончания периода в формате XML (ISO 8601)
                           example: "2026-02-28T23:59:59"
+                        active: 
+                          type: boolean
+                          description: Пометка активности периода
+                          example: "true" 
                   error:
                     type: 
                     - object
@@ -3595,8 +3600,9 @@ components:
           type: string
           description: Описание помещения
         photo:
-          type: string
-          nullable: true
+          type: 
+            - string
+            - "null"
           description: URL основной фотографии раздевалки
         pictures:
           type: array
@@ -3638,8 +3644,9 @@ components:
               type: string
               description: Наименование услуги
         card:
-          type: object
-          nullable: true
+          type: 
+            - object
+            - "null"
           description: Привязанная карта/ключ СКУД (null, если ключ еще не привязан)
           properties:
             id:
