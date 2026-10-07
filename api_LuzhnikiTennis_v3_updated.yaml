@@ -2780,6 +2780,12 @@ paths:
       tags:
       - Бронирование
       parameters:
+      - name: usertoken
+        in: query
+        description: Токен клиента
+        required: true
+        schema:
+          type: string
       - name: clubID
         in: query
         description: Идентификатор структурной единицы (клуба)
@@ -2795,27 +2801,80 @@ paths:
                 type: object
                 properties:
                   data:
-                    type: array
-                    description: Массив периодов массового бронирования
-                    items:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                          description: Наименование периода
-                          example: "Период массового бронирования 1"
-                        start_date:
-                          type: string
-                          description: Дата начала периода в формате XML (ISO 8601)
-                          example: "2026-02-01T00:00:00"
-                        end_date:
-                          type: string
-                          description: Дата окончания периода в формате XML (ISO 8601)
-                          example: "2026-02-28T23:59:59"
-                        active: 
-                          type: boolean
-                          description: Пометка активности периода
-                          example: "true" 
+                    type:
+                    - object
+                    - "null"
+                    description: Данные периодов бронирования. null, если периоды не найдены (Not Found)
+                    properties:
+                      available_periods:
+                        type: array
+                        description: Массив периодов массового бронирования
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              description: Наименование периода
+                              example: "Осенний семестр 2026"
+                            start_date:
+                              type: string
+                              description: Дата начала периода в формате XML (ISO 8601)
+                              example: "2026-09-01T00:00:00"
+                            end_date:
+                              type: string
+                              description: Дата окончания периода в формате XML (ISO 8601)
+                              example: "2026-12-31T23:59:59"
+                            active:
+                              type: string
+                              enum: ["true", "false"]
+                              description: Пометка активности периода (строка "true"/"false")
+                              example: "true"
+                            available_rooms:
+                              type: array
+                              description: Помещения, доступные для бронирования в периоде. Для неактивного периода всегда пустой массив
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    type: string
+                                    description: Идентификатор помещения (GUID)
+                                    example: "a3f1c2d4-5b6e-4f78-9a0b-1c2d3e4f5a6b"
+                                  title:
+                                    type:
+                                    - string
+                                    - "null"
+                                    description: Наименование помещения
+                                    example: "Большой зал"
+                                  description:
+                                    type:
+                                    - string
+                                    - "null"
+                                    description: Описание помещения для внешней системы
+                                    example: "Просторный зал с зеркалами и паркетом"
+                                  capacity:
+                                    type:
+                                    - integer
+                                    - "null"
+                                    description: Вместимость помещения. null, если не заполнена
+                                    example: 30
+                                  area:
+                                    type:
+                                    - number
+                                    - "null"
+                                    description: Площадь помещения. null, если не заполнена
+                                    example: 120.5
+                      payment_period:
+                        type: object
+                        description: Период, в который доступна оплата (продление) аренды
+                        properties:
+                          start_date:
+                            type: string
+                            description: Дата окончания последней будущей аренды клиента в формате XML (ISO 8601). "0001-01-01T00:00:00", если будущих аренд нет
+                            example: "2026-11-15T21:00:00"
+                          end_date:
+                            type: string
+                            description: Дата разрешения продления (start_date + срок смещения доступности оплаты). "0001-01-01T00:00:00", если будущих аренд нет
+                            example: "2026-11-18T21:00:00"
                   error:
                     type: 
                     - object
