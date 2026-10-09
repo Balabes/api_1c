@@ -2798,6 +2798,12 @@ paths:
         required: true
         schema:
           type: string
+      - name: apikey
+        in: header
+        description: e.g. 409265d1-a0af-4ce8-88ec-7e3435024111
+        required: true
+        schema:
+          type: string     
       responses:
         '200':
           description: OK
@@ -2869,18 +2875,18 @@ paths:
                                     - "null"
                                     description: Площадь помещения. null, если не заполнена
                                     example: 120.5
-                      payment_period:
-                        type: object
-                        description: Период, в который доступна оплата (продление) аренды
-                        properties:
-                          start_date:
-                            type: string
-                            description: Дата окончания последней будущей аренды клиента в формате XML (ISO 8601). "0001-01-01T00:00:00", если будущих аренд нет
-                            example: "2026-11-15T21:00:00"
-                          end_date:
-                            type: string
-                            description: Дата разрешения продления (start_date + срок смещения доступности оплаты). "0001-01-01T00:00:00", если будущих аренд нет
-                            example: "2026-11-18T21:00:00"
+                                  payment_period:
+                                   type: object
+                                   description: Период, в который доступна оплата (продление) аренды
+                                   properties:
+                                    start_date:
+                                      type: string
+                                      description: Дата окончания последней будущей аренды клиента в формате XML (ISO 8601). "0001-01-01T00:00:00", если будущих аренд нет
+                                      example: "2026-11-15T21:00:00"
+                                    end_date:
+                                      type: string
+                                      description: Дата разрешения продления (start_date + срок смещения доступности оплаты). "0001-01-01T00:00:00", если будущих аренд нет
+                                      example: "2026-11-18T21:00:00"
                   error:
                     type: 
                     - object
