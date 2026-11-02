@@ -2841,6 +2841,11 @@ paths:
                               enum: ["true", "false"]
                               description: Пометка активности периода (строка "true"/"false")
                               example: "true"
+                            period_available:
+                              type: string
+                              enum: ["true", "false"]
+                              description: Пометка доступности периода для бронирования (строка "true"/"false"). Для неактивного периода приходит "false"
+                              example: "true"
                             available_rooms:
                               type: array
                               description: Помещения, доступные для бронирования в периоде. Для неактивного периода всегда пустой массив
