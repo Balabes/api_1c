@@ -2880,34 +2880,18 @@ paths:
                                     - "null"
                                     description: Площадь помещения. null, если не заполнена
                                     example: 120.5
-                                  available_from:
-                                    type: string
-                                    description: Дата, начиная с которой помещение доступно для бронирования, в формате XML (ISO 8601). "0001-01-01T00:00:00", если дата не задана
-                                    example: "0001-01-01T00:00:00"
-                            payment_period:
-                              type: object
-                              description: Период, в который доступна оплата (продление) аренды
-                              properties:
-                                start_date:
-                                  type: string
-                                  description: Дата окончания последней будущей аренды клиента в формате XML (ISO 8601). "0001-01-01T00:00:00", если будущих аренд нет
-                                  example: "2026-11-15T21:00:00"
-                                end_date:
-                                  type: string
-                                  description: Дата разрешения продления (start_date + срок смещения доступности оплаты). "0001-01-01T00:00:00", если будущих аренд нет
-                                  example: "2026-11-18T21:00:00"
-                            payment_period_default:
-                              type: object
-                              description: Период оплаты по умолчанию для данного периода бронирования
-                              properties:
-                                start_date:
-                                  type: string
-                                  description: Дата начала периода оплаты по умолчанию в формате XML (ISO 8601). "0001-01-01T00:00:00", если не задана
-                                  example: "2026-11-01T00:00:00"
-                                end_date:
-                                  type: string
-                                  description: Дата окончания периода оплаты по умолчанию в формате XML (ISO 8601). "0001-01-01T00:00:00", если не задана
-                                  example: "2026-11-30T00:00:00"
+                                  payment_period:
+                                   type: object
+                                   description: Период, в который доступна оплата (продление) аренды
+                                   properties:
+                                    start_date:
+                                      type: string
+                                      description: Дата окончания последней будущей аренды клиента в формате XML (ISO 8601). "0001-01-01T00:00:00", если будущих аренд нет
+                                      example: "2026-11-15T21:00:00"
+                                    end_date:
+                                      type: string
+                                      description: Дата разрешения продления (start_date + срок смещения доступности оплаты). "0001-01-01T00:00:00", если будущих аренд нет
+                                      example: "2026-11-18T21:00:00"
                   error:
                     type: 
                     - object
