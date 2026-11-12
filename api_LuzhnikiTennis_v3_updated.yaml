@@ -1032,6 +1032,197 @@ paths:
                 locker_room_count:
                   type: integer
                   description: Количество запрашиваемых раздевалок (1 или 2). Если параметр не передан или равен 0, по умолчанию принимается 1.
+  /hs/api/v3/payment:
+    post:
+      summary: Оплата заказа / аренды / депозита {payment}
+      operationId: payment
+      description: |
+        Универсальный метод проведения оплаты (с депозита/лицевого счета, банковской карты или СБП).
+
+        ### Оплата с депозита / лицевого счета:
+        - Если передается `deposit_id` или `payment_list` с типом `deposit`, покрывающий полную сумму заказа:
+          - Оплата завершается синхронно (без перехода на платежный шлюз);
+          - В ответе возвращается `status: "paid"`, `link: ""` (пустая строка), `id` и `order_id`;
+          - Для заказов аренды/массового бронирования (`mass_booking: true`) автоматически создаются документы «Занятие», и в ответе возвращается массив `rentals` с перечнем созданных занятий (`rental_id`, `room_id`, `start_date`, `end_date`).
+
+        ### Оплата через эквайринг / СБП:
+        - Если сумма не покрыта депозитом, формируется заказ на эквайринг и возвращается платежная ссылка `link` со статусом `status: "pending"`.
+        - Документы аренды создаются после подтверждения оплаты банком (статус проверяется через `GET /hs/api/v3/payment_link_status/`).
+
+        ### Коды ошибок:
+        - `1123`: Слот времени уже занят другим клиентом.
+        - `1055`: Недостаточно средств на лицевом счете (депозите).
+        - `2003`: Ошибка при создании бронирования или проведении оплаты.
+      tags:
+      - Оплаты
+      parameters:
+      - name: apikey
+        in: header
+        description: API-ключ внешней системы
+        required: false
+        schema:
+          type: string
+        example: 409265d1-a0af-4ce8-88ec-7e3435024111
+      - name: usertoken
+        in: header
+        description: Токен авторизованного пользователя
+        required: false
+        schema:
+          type: string
+        example: 7e8245d1-574f-4ce8-88ec-7e34358df45
+      - name: token-master
+        in: header
+        description: Токен плательщика (если отличается от клиента)
+        required: false
+        schema:
+          type: string
+        example: a62afb1e-97b2-11e7-b142-0050568b93ed
+      requestBody:
+        content:
+          application/json:
+            examples:
+              deposit_mass_booking:
+                summary: Оплата аренды корта с депозита / лицевого счета
+                value:
+                  club_id: c9f593d0-fdb8-11f0-8939-0050568b5c63
+                  mass_booking: true
+                  deposit_id: 54db2807-ddd3-11f1-bca4-00505683a460
+                  payment_list:
+                  - type: deposit
+                    amount: 7000
+                    id: 54db2807-ddd3-11f1-bca4-00505683a460
+                  cart:
+                  - purchase_id: 2acfc4d2-2437-11f1-96dd-0050568b5c63
+                    count: 1
+                    start_date: '2026-11-16T09:00:00'
+              card_mass_booking:
+                summary: Оплата аренды банковской картой / СБП
+                value:
+                  club_id: c9f593d0-fdb8-11f0-8939-0050568b5c63
+                  mass_booking: true
+                  payment_list:
+                  - type: card
+                    amount: 7000
+                  cart:
+                  - purchase_id: 2acfc4d2-2437-11f1-96dd-0050568b5c63
+                    count: 1
+                    start_date: '2026-11-16T09:00:00'
+                  success_url: https://tennis.luzhniki.ru/booking/success
+                  fail_url: https://tennis.luzhniki.ru/booking/fail
+            schema:
+              type: object
+              required:
+              - club_id
+              - payment_list
+              properties:
+                club_id:
+                  type: string
+                  description: Идентификатор структурной единицы (клуба)
+                deposit_id:
+                  type: string
+                  description: Идентификатор депозита (лицевого счета)
+                mass_booking:
+                  type: boolean
+                  description: Признак массового бронирования аренды
+                payment_list:
+                  $ref: '#/components/schemas/PaymentList'
+                  description: Массив оплат
+                cart:
+                  $ref: '#/components/schemas/cart'
+                  description: Массив оплачиваемых номенклатур
+                cart_rental:
+                  $ref: '#/components/schemas/CartRental'
+                  description: Массив слотов аренды
+                transaction_id:
+                  type: string
+                  description: Идентификатор транзакции внешней системы
+                success_url:
+                  type: string
+                  description: URL возврата при успешной оплате
+                fail_url:
+                  type: string
+                  description: URL возврата при ошибке оплаты
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: Идентификатор заказа
+                      order_id:
+                        type: string
+                        description: Идентификатор заказа (дублирует id)
+                      link:
+                        type: string
+                        description: Платежная ссылка (пустая при оплате с депозита)
+                      status:
+                        type: string
+                        description: 'Статус оплаты: paid (оплачено сразу), pending (ожидает оплаты эквайринга)'
+                      rentals:
+                        type: array
+                        description: Массив созданных занятий (при оплате аренды/массового бронирования)
+                        items:
+                          type: object
+                          properties:
+                            rental_id:
+                              type: string
+                              description: Идентификатор созданного занятия в 1С
+                            room_id:
+                              type: string
+                              description: Идентификатор помещения (корта)
+                            start_date:
+                              type: string
+                              description: Дата и время начала занятия
+                            end_date:
+                              type: string
+                              description: Дата и время окончания занятия
+                required:
+                - result
+              examples:
+                deposit_success:
+                  summary: Успешная оплата с депозита (возвращает созданные занятия)
+                  value:
+                    result: true
+                    data:
+                      id: 412c3fd7cb9a4e6bb44c517c9fc765b1
+                      order_id: 412c3fd7cb9a4e6bb44c517c9fc765b1
+                      link: ''
+                      status: paid
+                      rentals:
+                      - rental_id: 6589ff23-de01-11f1-bca4-00505683a460
+                        room_id: a1ba2b68-013f-11f1-8939-0050568b5c63
+                        start_date: '2026-11-16 09:00:00'
+                        end_date: '2026-11-16 10:00:00'
+                card_link:
+                  summary: Оплата через эквайринг (возвращает ссылку на оплату)
+                  value:
+                    result: true
+                    data:
+                      id: 412c3fd7cb9a4e6bb44c517c9fc765b1
+                      order_id: 412c3fd7cb9a4e6bb44c517c9fc765b1
+                      link: https://glk.me/sNwyY
+                      status: pending
+                error_conflict:
+                  summary: Ошибка 1123 - слот уже занят
+                  value:
+                    result: false
+                    error: 1123
+                    error_message: Выбранный слот уже занят другим клиентом
+                error_deposit:
+                  summary: Ошибка 1055 - недостаточно средств на депозите
+                  value:
+                    result: false
+                    error: 1055
+                    error_message: Недостаточно средств на лицевом счете
   /hs/api/v3/payment_link:
     post:
       responses:
@@ -1048,11 +1239,32 @@ paths:
                   data:
                     type: object
                     properties:
-                      link:
-                        type: string
                       id:
                         type: string
                         description: Идентификатор заказа. Используется для последующего запроса статуса оплаты платёжной ссылки.
+                      order_id:
+                        type: string
+                        description: Идентификатор заказа (order_id)
+                      link:
+                        type: string
+                        description: Платежная ссылка СБП / эквайринга (пустая при оплате с депозита)
+                      status:
+                        type: string
+                        description: 'Статус: paid (оплачено сразу), pending (ожидает оплаты)'
+                      rentals:
+                        type: array
+                        description: Перечень созданных занятий (при моментальной оплате с депозита)
+                        items:
+                          type: object
+                          properties:
+                            rental_id:
+                              type: string
+                            room_id:
+                              type: string
+                            start_date:
+                              type: string
+                            end_date:
+                              type: string
                     required:
                     - id
                 title: СоздатьСсылкуНаОплатуOk
@@ -1061,23 +1273,23 @@ paths:
                   value:
                     result: true
                     data:
-                      link: https://glk.me/sNwyY
-                example2:
-                  value:
-                    result: true
-                    data:
-                      link: https://glk.me/sNwyY
-                example3:
-                  value:
-                    result: true
-                    data:
-                      link: https://glk.me/sNwyY
-                example4:
-                  value:
-                    result: true
-                    data:
                       id: 1234
+                      order_id: 1234
                       link: https://glk.me/sNwyY
+                      status: pending
+                example2_deposit:
+                  value:
+                    result: true
+                    data:
+                      id: 412c3fd7cb9a4e6bb44c517c9fc765b1
+                      order_id: 412c3fd7cb9a4e6bb44c517c9fc765b1
+                      link: ''
+                      status: paid
+                      rentals:
+                      - rental_id: 6589ff23-de01-11f1-bca4-00505683a460
+                        room_id: a1ba2b68-013f-11f1-8939-0050568b5c63
+                        start_date: '2026-11-16 09:00:00'
+                        end_date: '2026-11-16 10:00:00'
       summary: Создать ссылку на оплату {payment_link}
       operationId: payment_link
       description: |
