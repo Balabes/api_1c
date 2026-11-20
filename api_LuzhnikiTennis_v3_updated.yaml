@@ -3690,6 +3690,154 @@ paths:
         schema:
           type: string
         example: 580392-e6ba49428-0ac67fcd-f2180121
+  /hs/api/v3/refill_deposit/:
+    post:
+      summary: Пополнить лицевой счет клиента {refill_deposit}
+      operationId: refill_deposit
+      description: |
+        Метод начисляет деньги на лицевой счет (депозит) клиента.
+
+        ### Оплата банковской картой (платеж уже проведен в банке):
+        - Передаются `deposit_id`, `transaction_id`, `cost` и `payment_info` (данные эквайринга);
+        - Метод создает и проводит документ «Поступление денежных средств» с видом операции «Взнос на лицевой счет»;
+        - Деньги с карты не списываются: предполагается, что оплата уже выполнена на стороне банка (платежная форма, SDK приложения).
+
+        ### Оплата платежной связкой (списание выполняет 1С) — новое:
+        - Вместо `payment_info` передается `payment_list` с элементом `pay_card`, где `id` — идентификатор платежной связки:
+          `{"pay_card": [{"id": "<UUID платежной связки>", "val": 2000}]}`
+        - 1С создает поступление и сама списывает сумму с привязанной карты через эквайринговый терминал;
+        - `val` должен совпадать с `cost`, допускается только одна связка (смешанные оплаты не поддерживаются);
+        - терминал должен поддерживать списание по связке: Сбербанк, Сбербанк v2, РСХБ, CloudPayments, TipTopPay, ЮКасса, PayU, Stripe, BePaid, ВТБ, Райффайзенбанк;
+        - документ создается только после успешного ответа банка; при отказе банка возвращается ошибка `4073` с текстом банка, лицевой счет не пополняется.
+
+        ### Коды ошибок:
+        - `1011`: Не найден лицевой счет.
+        - `1018`: Платеж уже записан в 1С (повторный вызов с тем же `transaction_id`).
+        - `1114`: Не настроен эквайринговый терминал.
+        - `1115`: Не передан `transaction_id`.
+        - `1121`: Неверный формат `payment_list`.
+        - `4054`: Не найдена привязка карты (не передан `id` платежной связки или связка не найдена).
+        - `4073`: Ошибка оплаты платежной связкой, сумма не совпадает с суммой пополнения или терминал не поддерживает списание по связке.
+      tags:
+      - Оплаты
+      parameters:
+      - name: apikey
+        in: header
+        description: API-ключ внешней системы
+        required: false
+        schema:
+          type: string
+        example: 409265d1-a0af-4ce8-88ec-7e3435024111
+      - name: usertoken
+        in: header
+        description: Ключ клиента
+        required: true
+        schema:
+          type: string
+        example: 580392-e6ba49428-0ac67fcd-f2180121
+      - name: token-master
+        in: header
+        description: Токен плательщика (если отличается от клиента)
+        required: false
+        schema:
+          type: string
+        example: a62afb1e-97b2-11e7-b142-0050568b93ed
+      requestBody:
+        content:
+          application/json:
+            example:
+              club_id: c9f593d0-fdb8-11f0-8939-0050568b5c63
+              deposit_id: 54db2807-ddd3-11f1-bca4-00505683a460
+              transaction_id: '789654123'
+              cost: 2000
+              payment_list:
+                type: card
+                amount: 2000
+                pay_card:
+                - id: 05f5afff-e166-11e6-b16f-3085a98f71a0
+                  val: 2000
+            schema:
+              type: object
+              required:
+              - deposit_id
+              - transaction_id
+              - cost
+              properties:
+                club_id:
+                  type: string
+                  description: Идентификатор структурной единицы (клуба)
+                deposit_id:
+                  type: string
+                  description: Идентификатор лицевого счета (UUID) или вида лицевого счета
+                transaction_id:
+                  type: string
+                  description: Идентификатор транзакции (уникальный, используется для защиты от дублей)
+                cost:
+                  type: number
+                  description: Сумма пополнения лицевого счета
+                payment_info:
+                  $ref: '#/components/schemas/paymentInfo'
+                  description: Данные эквайринга при оплате картой на стороне банка (не передается вместе с payment_list)
+                payment_list:
+                  $ref: '#/components/schemas/PaymentList'
+                  description: Массив структур оплат. Для оплаты платежной связкой передается элемент pay_card (id - UUID платежной связки, val - сумма), списание с привязанной карты выполняет 1С.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    $ref: '#/components/schemas/ResultResponse'
+                  data:
+                    type: object
+                    description: Пустой объект
+                    properties: {}
+              examples:
+                success:
+                  summary: Лицевой счет пополнен
+                  value:
+                    result: true
+                    data: {}
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              examples:
+                error_binding_not_found:
+                  summary: Ошибка 4054 - не найдена платежная связка
+                  value:
+                    result: false
+                    error: 4054
+                    error_message: Не найдена привязка карты
+                error_binding_sum:
+                  summary: Ошибка 4073 - сумма не совпадает с суммой пополнения
+                  value:
+                    result: false
+                    error: 4073
+                    error_message: Сумма оплаты по платежной связке не совпадает с суммой пополнения лицевого счета
+                error_duplicate:
+                  summary: Ошибка 1018 - платеж уже записан
+                  value:
+                    result: false
+                    error: 1018
+                    error_message: Платеж уже записан в 1с
+        '401':
+          description: Ошибка авторизации
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/AuthorizationError'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
 components:
   securitySchemes:
     basicAuth:
@@ -3988,6 +4136,23 @@ components:
         id:
           type: string
           description: Идентификатор лицевого (бонусного) счета (необходимо передавать только при оплате с лицевого (бонусного) счета)
+        pay_card:
+          type: array
+          description: Оплата платежной связкой (для пополнения лицевого счета). id - UUID платежной связки, val - сумма оплаты; списание с привязанной карты выполняет 1С
+          minItems: 1
+          maxItems: 1
+          items:
+            type: object
+            required:
+            - id
+            - val
+            properties:
+              id:
+                type: string
+                description: Идентификатор платежной связки (UUID)
+              val:
+                type: number
+                description: Сумма оплаты по связке. Должна совпадать с параметром cost
     RecordRental:
       type: object
       required:
